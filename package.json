@@ -1,0 +1,26 @@
+{
+  "name": "fluxo-de-caixa",
+  "private": true,
+  "version": "0.1.0",
+  "engines": {
+    "node": ">=22.12 <23.0.0"
+  },
+  "workspaces": [
+    "shared",
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "build": "npm run build -w web",
+    "start": "npm run start -w server",
+    "dev:server": "npm run dev -w server",
+    "dev:web": "npm run dev -w web",
+    "db:migrate": "npm run db:migrate -w server",
+    "db:reset": "npm run db:reset -w server",
+    "test": "npm test -w server",
+    "typecheck": "npm run typecheck -w shared && npm run typecheck -w server && npm run typecheck -w web",
+    "org:create": "npm run org:create -w server",
+    "seed:triari": "npm run seed:triari -w server",
+    "reset-password": "npm run reset-password -w server"
+  }
+}

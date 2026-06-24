@@ -1,0 +1,237 @@
+// Modelo do spec seção 4. SQLite não suporta enums no Prisma, então os campos
+// direction/kind/type são String validados na borda (zod) e nos services:
+//   Entry.direction / Recurrence.direction: "PAYABLE" | "RECEIVABLE"
+//   Category.kind: "EXPENSE" | "INCOME"
+//   Movement.type: "SETTLEMENT" | "REVERSAL" | "TRANSFER_OUT" | "TRANSFER_IN"
+// Valores monetários sempre em centavos (Int). Saldo e status nunca são colunas.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Organization {
+  id                 String   @id @default(cuid())
+  name               String
+  closedThroughMonth String? // "YYYY-MM"; lançamentos com competência <= este mês são bloqueados
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  users        User[]
+  bankAccounts BankAccount[]
+  categories   Category[]
+  costCenters  CostCenter[]
+  entries      Entry[]
+  settlements  Settlement[]
+  recurrences  Recurrence[]
+  movements    Movement[]
+  transfers    Transfer[]
+}
+
+model User {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  email          String   @unique
+  passwordHash   String
+  role           String   @default("ADMIN")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  settlements  Settlement[]
+  movements    Movement[]
+  transfers    Transfer[]
+
+  @@index([organizationId])
+}
+
+model BankAccount {
+  id                  String    @id @default(cuid())
+  organizationId      String
+  name                String
+  initialBalanceCents Int
+  archivedAt          DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  settlements  Settlement[]
+  movements    Movement[]
+  transfersOut Transfer[]   @relation("TransferFrom")
+  transfersIn  Transfer[]   @relation("TransferTo")
+
+  @@index([organizationId])
+}
+
+model Category {
+  id             String    @id @default(cuid())
+  organizationId String
+  name           String
+  kind           String // "EXPENSE" | "INCOME"
+  archivedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  entries      Entry[]
+  recurrences  Recurrence[]
+
+  @@index([organizationId])
+}
+
+model CostCenter {
+  id             String    @id @default(cuid())
+  organizationId String
+  name           String
+  archivedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  entries      Entry[]
+  recurrences  Recurrence[]
+
+  @@index([organizationId])
+}
+
+model Entry {
+  id                 String    @id @default(cuid())
+  organizationId     String
+  direction          String // "PAYABLE" | "RECEIVABLE"
+  description        String
+  counterparty       String
+  notes              String?
+  categoryId         String
+  costCenterId       String?
+  amountCents        Int
+  competenceMonth    String // "YYYY-MM"
+  dueDate            DateTime
+  recurrenceId       String?
+  installmentGroupId String?
+  installmentNumber  Int?
+  installmentTotal   Int?
+  deletedAt          DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  category     Category     @relation(fields: [categoryId], references: [id])
+  costCenter   CostCenter?  @relation(fields: [costCenterId], references: [id])
+  recurrence   Recurrence?  @relation(fields: [recurrenceId], references: [id])
+  settlements  Settlement[]
+
+  @@index([organizationId, competenceMonth])
+  @@index([organizationId, dueDate])
+  @@index([organizationId, direction])
+  @@index([recurrenceId])
+  @@index([installmentGroupId])
+}
+
+model Settlement {
+  id            String   @id @default(cuid())
+  organizationId String
+  entryId       String
+  amountCents   Int // positivo na baixa, negativo no estorno
+  settledAt     DateTime
+  bankAccountId String
+  userId        String
+  notes         String?
+  importFitid   String? // FITID da transação OFX que originou esta baixa (dedup de reimportação)
+  reversalOfId  String?  @unique // na settlement compensatória: aponta a original
+  reversedById  String?  @unique // na original: aponta a compensatória
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  entry        Entry        @relation(fields: [entryId], references: [id])
+  bankAccount  BankAccount  @relation(fields: [bankAccountId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+  reversalOf   Settlement?  @relation("ReversalOf", fields: [reversalOfId], references: [id])
+  reversalFor  Settlement?  @relation("ReversalOf")
+  reversedBy   Settlement?  @relation("ReversedBy", fields: [reversedById], references: [id])
+  reversedFrom Settlement?  @relation("ReversedBy")
+  movements    Movement[]
+
+  @@index([entryId])
+  @@index([organizationId, settledAt])
+  @@index([bankAccountId])
+  @@unique([bankAccountId, importFitid])
+}
+
+model Recurrence {
+  id             String    @id @default(cuid())
+  organizationId String
+  direction      String // "PAYABLE" | "RECEIVABLE"
+  description    String
+  counterparty   String
+  categoryId     String
+  costCenterId   String?
+  amountCents    Int
+  dueDay         Int // 1-31; meses curtos usam o último dia
+  startMonth     String // "YYYY-MM"
+  endMonth       String? // "YYYY-MM"
+  // último mês já materializado; ensureHorizon só gera meses à frente dele,
+  // então ocorrências desvinculadas/excluídas nunca são recriadas
+  materializedUntil String?
+  canceledAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  category     Category     @relation(fields: [categoryId], references: [id])
+  costCenter   CostCenter?  @relation(fields: [costCenterId], references: [id])
+  entries      Entry[]
+
+  @@index([organizationId])
+}
+
+model Movement {
+  id             String   @id @default(cuid())
+  organizationId String
+  bankAccountId  String
+  amountCents    Int // com sinal: negativo sai, positivo entra
+  type           String // "SETTLEMENT" | "REVERSAL" | "TRANSFER_OUT" | "TRANSFER_IN"
+  settlementId   String?
+  transferId     String?
+  userId         String
+  description    String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  bankAccount  BankAccount  @relation(fields: [bankAccountId], references: [id])
+  settlement   Settlement?  @relation(fields: [settlementId], references: [id])
+  transfer     Transfer?    @relation(fields: [transferId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+
+  @@index([bankAccountId, createdAt])
+  @@index([organizationId])
+  @@index([settlementId])
+  @@index([transferId])
+}
+
+model Transfer {
+  id             String   @id @default(cuid())
+  organizationId String
+  fromAccountId  String
+  toAccountId    String
+  amountCents    Int
+  date           DateTime
+  userId         String
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  fromAccount  BankAccount  @relation("TransferFrom", fields: [fromAccountId], references: [id])
+  toAccount    BankAccount  @relation("TransferTo", fields: [toAccountId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+  movements    Movement[]
+
+  @@index([organizationId])
+}

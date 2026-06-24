@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluxo de Caixa — Opções de layout do painel</title>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --ink: #1a2233;
+    --ink-soft: #5b6577;
+    --line: #e3e6ec;
+    --green: #0e7a4e;
+    --green-bg: #e7f5ee;
+    --red: #b4232a;
+    --red-bg: #fdecec;
+    --amber: #92600a;
+    --amber-bg: #fdf3e0;
+    --blue: #1d4ed8;
+    --navy: #14213d;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--ink);
+    padding: 32px 24px 80px;
+  }
+  .intro { max-width: 1180px; margin: 0 auto 40px; }
+  .intro h1 { font-size: 22px; margin-bottom: 6px; }
+  .intro p { color: var(--ink-soft); font-size: 14px; }
+  .option-label {
+    max-width: 1180px; margin: 56px auto 14px;
+    font-size: 15px; font-weight: 700; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--blue);
+    border-top: 3px solid var(--blue); padding-top: 10px;
+  }
+  .option-desc { max-width: 1180px; margin: 0 auto 18px; color: var(--ink-soft); font-size: 14px; }
+  .frame {
+    max-width: 1180px; margin: 0 auto;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; overflow: hidden;
+    box-shadow: 0 8px 28px rgba(20,33,61,.08);
+  }
+  /* ============ shared bits ============ */
+  .money { font-variant-numeric: tabular-nums; }
+  .pos { color: var(--green); }
+  .neg { color: var(--red); }
+  .chip {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 999px;
+  }
+  .chip.open    { background: #eef1f6; color: var(--ink-soft); }
+  .chip.overdue { background: var(--red-bg); color: var(--red); }
+  .chip.today   { background: var(--amber-bg); color: var(--amber); }
+  .chip.paid    { background: var(--green-bg); color: var(--green); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .05em;
+       color: var(--ink-soft); padding: 8px 12px; border-bottom: 1px solid var(--line); }
+  td { padding: 9px 12px; border-bottom: 1px solid var(--line); }
+  td.r, th.r { text-align: right; }
+
+  /* ============ OPTION A ============ */
+  .a-top {
+    background: var(--navy); color: #fff;
+    padding: 22px 28px; display: flex; align-items: center; gap: 28px;
+  }
+  .a-top .brand { font-weight: 700; font-size: 15px; }
+  .a-top nav { display: flex; gap: 20px; font-size: 13px; color: #aeb8cf; }
+  .a-top nav .active { color: #fff; font-weight: 600; border-bottom: 2px solid #5b8def; padding-bottom: 3px; }
+  .a-top .month { margin-left: auto; background: rgba(255,255,255,.1); border-radius: 8px;
+                  padding: 6px 14px; font-size: 13px; }
+  .a-hero {
+    display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 16px;
+    padding: 24px 28px; border-bottom: 1px solid var(--line); background: #fafbfc;
+  }
+  .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+  .kpi .lbl { font-size: 12px; color: var(--ink-soft); margin-bottom: 6px; }
+  .kpi .val { font-size: 24px; font-weight: 700; }
+  .kpi .sub { font-size: 12px; color: var(--ink-soft); margin-top: 6px; }
+  .kpi.saldo { background: var(--navy); color: #fff; border: none; }
+  .kpi.saldo .lbl { color: #aeb8cf; }
+  .kpi.saldo .val { font-size: 30px; }
+  .kpi.saldo .sub { color: #aeb8cf; }
+  .a-body { display: grid; grid-template-columns: 2fr 1fr; gap: 0; }
+  .a-main { padding: 20px 28px; border-right: 1px solid var(--line); }
+  .a-side { padding: 20px 22px; background: #fafbfc; }
+  .sec-title { font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+  .alert {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 13px; padding: 10px 12px; border-radius: 8px; margin-bottom: 8px;
+  }
+  .alert.overdue { background: var(--red-bg); }
+  .alert.today { background: var(--amber-bg); }
+  .alert.soon { background: #eef1f6; }
+  .acct { display: flex; justify-content: space-between; font-size: 13px;
+          padding: 10px 0; border-bottom: 1px solid var(--line); }
+
+  /* ============ OPTION B ============ */
+  .b-wrap { display: grid; grid-template-columns: 220px 1fr; min-height: 620px; }
+  .b-nav { background: var(--navy); color: #aeb8cf; padding: 22px 0; font-size: 13px; }
+  .b-nav .brand { color: #fff; font-weight: 700; font-size: 15px; padding: 0 22px 22px; }
+  .b-nav a { display: block; padding: 10px 22px; color: inherit; text-decoration: none; }
+  .b-nav a.active { background: rgba(91,141,239,.18); color: #fff; border-left: 3px solid #5b8def; padding-left: 19px; }
+  .b-nav .accounts { margin-top: 28px; padding: 14px 22px 0; border-top: 1px solid rgba(255,255,255,.12); }
+  .b-nav .accounts .t { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; }
+  .b-nav .acct-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 12px; }
+  .b-nav .acct-row b { color: #fff; font-weight: 600; }
+  .b-main { padding: 24px 28px; }
+  .b-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 20px; }
+  .b-head h2 { font-size: 18px; }
+  .b-head .month { margin-left: auto; border: 1px solid var(--line); border-radius: 8px;
+                   padding: 6px 14px; font-size: 13px; color: var(--ink-soft); background: var(--surface); }
+  .b-saldo-strip {
+    display: flex; gap: 0; border: 1px solid var(--line); border-radius: 10px;
+    overflow: hidden; margin-bottom: 20px; background: var(--surface);
+  }
+  .b-saldo-strip .cell { flex: 1; padding: 16px 20px; border-right: 1px solid var(--line); }
+  .b-saldo-strip .cell:last-child { border-right: none; }
+  .b-saldo-strip .lbl { font-size: 12px; color: var(--ink-soft); margin-bottom: 4px; }
+  .b-saldo-strip .val { font-size: 21px; font-weight: 700; }
+  .b-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+  .card .hd { padding: 12px 16px; font-size: 13px; font-weight: 700; border-bottom: 1px solid var(--line);
+              display: flex; justify-content: space-between; }
+  .proj { padding: 14px 16px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; font-size: 12px; margin-bottom: 8px; }
+  .bar-row .m { width: 36px; color: var(--ink-soft); }
+  .bar-row .bar { height: 14px; border-radius: 4px; background: var(--green-bg); position: relative; }
+  .bar-row .bar.n { background: var(--red-bg); }
+  .bar-row .v { width: 84px; text-align: right; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="intro">
+  <h1>Painel de Fluxo de Caixa — duas opções de layout</h1>
+  <p>Mesmos dados, duas organizações. Role a página para comparar e me diga qual prefere (A ou B). Cores, tipografia e refinamento final vêm depois — aqui a decisão é a <b>estrutura</b>.</p>
+</div>
+
+<!-- ================= OPTION A ================= -->
+<div class="option-label">Opção A — Saldo como herói, navegação no topo</div>
+<div class="option-desc">Barra de navegação horizontal. O saldo realizado domina o topo em um cartão escuro, ladeado pelos KPIs do mês. Alertas e contas bancárias numa coluna lateral direita; a tabela de próximos vencimentos é o corpo principal.</div>
+<div class="frame">
+  <div class="a-top">
+    <div class="brand">▦ FluxoCaixa</div>
+    <nav>
+      <span class="active">Painel</span><span>A pagar</span><span>A receber</span><span>Contas bancárias</span><span>Relatórios</span>
+    </nav>
+    <div class="month">◀ &nbsp; Junho 2026 &nbsp; ▶</div>
+  </div>
+  <div class="a-hero">
+    <div class="kpi saldo">
+      <div class="lbl">Saldo atual (todas as contas)</div>
+      <div class="val money">R$ 48.230,12</div>
+      <div class="sub">Previsto p/ fim do mês: <b class="money">R$ 41.180,12</b></div>
+    </div>
+    <div class="kpi">
+      <div class="lbl">A receber em junho</div>
+      <div class="val money pos">R$ 32.400,00</div>
+      <div class="sub">R$ 18.200,00 já recebidos</div>
+    </div>
+    <div class="kpi">
+      <div class="lbl">A pagar em junho</div>
+      <div class="val money neg">R$ 27.950,00</div>
+      <div class="sub">R$ 12.300,00 já pagos</div>
+    </div>
+    <div class="kpi">
+      <div class="lbl">Resultado do mês (previsto)</div>
+      <div class="val money pos">+ R$ 4.450,00</div>
+      <div class="sub">realizado até hoje: + R$ 5.900,00</div>
+    </div>
+  </div>
+  <div class="a-body">
+    <div class="a-main">
+      <div class="sec-title">Próximos vencimentos</div>
+      <table>
+        <tr><th>Vencimento</th><th>Descrição</th><th>Categoria</th><th class="r">Valor</th><th>Status</th></tr>
+        <tr><td>10/06</td><td>Aluguel galpão — Imobiliária Silva</td><td>Aluguel</td><td class="r money neg">R$ 4.500,00</td><td><span class="chip overdue">Vencida</span></td></tr>
+        <tr><td>12/06</td><td>NF 1042 — Cliente Alfa Ltda</td><td>Vendas</td><td class="r money pos">R$ 8.200,00</td><td><span class="chip today">Vence hoje</span></td></tr>
+        <tr><td>15/06</td><td>Energia elétrica — Enel</td><td>Utilidades</td><td class="r money neg">R$ 980,00</td><td><span class="chip open">Em aberto</span></td></tr>
+        <tr><td>15/06</td><td>Parcela 3/6 — Notebook Dell</td><td>Equipamentos</td><td class="r money neg">R$ 833,34</td><td><span class="chip open">Em aberto</span></td></tr>
+        <tr><td>20/06</td><td>Mensalidade — Cliente Beta SA</td><td>Serviços</td><td class="r money pos">R$ 6.000,00</td><td><span class="chip open">Em aberto</span></td></tr>
+        <tr><td>05/06</td><td>Internet fibra — Vivo</td><td>Utilidades</td><td class="r money neg">R$ 299,90</td><td><span class="chip paid">Paga em 05/06</span></td></tr>
+      </table>
+    </div>
+    <div class="a-side">
+      <div class="sec-title">Alertas</div>
+      <div class="alert overdue"><span>⚠ 2 contas vencidas</span><b class="money neg">R$ 5.480,00</b></div>
+      <div class="alert today"><span>1 vence hoje</span><b class="money">R$ 8.200,00</b></div>
+      <div class="alert soon"><span>4 nos próximos 7 dias</span><b class="money">R$ 9.113,34</b></div>
+      <div class="sec-title" style="margin-top:22px">Contas bancárias</div>
+      <div class="acct"><span>Itaú PJ</span><b class="money">R$ 35.410,12</b></div>
+      <div class="acct"><span>Nubank PJ</span><b class="money">R$ 12.820,00</b></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= OPTION B ================= -->
+<div class="option-label">Opção B — Sidebar fixa com saldos sempre visíveis</div>
+<div class="option-desc">Navegação vertical à esquerda com os saldos por conta sempre à vista em qualquer tela. O painel mostra uma régua de saldos no topo (atual → previsto), e o corpo divide alertas/vencimentos da projeção de saldo dos próximos meses.</div>
+<div class="frame">
+  <div class="b-wrap">
+    <div class="b-nav">
+      <div class="brand">▦ FluxoCaixa</div>
+      <a class="active">Painel</a>
+      <a>A pagar</a>
+      <a>A receber</a>
+      <a>Contas bancárias</a>
+      <a>Relatórios</a>
+      <a>Categorias</a>
+      <div class="accounts">
+        <div class="t">Saldos</div>
+        <div class="acct-row"><span>Itaú PJ</span><b class="money">35.410,12</b></div>
+        <div class="acct-row"><span>Nubank PJ</span><b class="money">12.820,00</b></div>
+        <div class="acct-row" style="border-top:1px solid rgba(255,255,255,.12); margin-top:6px; padding-top:8px"><span>Total</span><b class="money">48.230,12</b></div>
+      </div>
+    </div>
+    <div class="b-main">
+      <div class="b-head">
+        <h2>Painel</h2>
+        <div class="month">◀ &nbsp; Junho 2026 &nbsp; ▶</div>
+      </div>
+      <div class="b-saldo-strip">
+        <div class="cell"><div class="lbl">Saldo atual</div><div class="val money">R$ 48.230,12</div></div>
+        <div class="cell"><div class="lbl">A receber no mês</div><div class="val money pos">R$ 32.400,00</div></div>
+        <div class="cell"><div class="lbl">A pagar no mês</div><div class="val money neg">R$ 27.950,00</div></div>
+        <div class="cell"><div class="lbl">Saldo previsto (30/06)</div><div class="val money">R$ 41.180,12</div></div>
+      </div>
+      <div class="b-cols">
+        <div class="card">
+          <div class="hd"><span>Atenção</span><span class="chip overdue">2 vencidas</span></div>
+          <table>
+            <tr><td>10/06</td><td>Aluguel galpão</td><td class="r money neg">R$ 4.500,00</td><td><span class="chip overdue">Vencida</span></td></tr>
+            <tr><td>08/06</td><td>NF 998 — Cliente Gama</td><td class="r money pos">R$ 980,00</td><td><span class="chip overdue">Vencida</span></td></tr>
+            <tr><td>12/06</td><td>NF 1042 — Cliente Alfa</td><td class="r money pos">R$ 8.200,00</td><td><span class="chip today">Hoje</span></td></tr>
+            <tr><td>15/06</td><td>Energia — Enel</td><td class="r money neg">R$ 980,00</td><td><span class="chip open">7 dias</span></td></tr>
+            <tr><td>15/06</td><td>Parcela 3/6 — Notebook</td><td class="r money neg">R$ 833,34</td><td><span class="chip open">7 dias</span></td></tr>
+          </table>
+        </div>
+        <div class="card">
+          <div class="hd"><span>Projeção de saldo</span><span style="color:var(--ink-soft); font-weight:400">com contas em aberto</span></div>
+          <div class="proj">
+            <div class="bar-row"><span class="m">jun</span><div class="bar" style="width:52%"></div><span class="v money">41.180</span></div>
+            <div class="bar-row"><span class="m">jul</span><div class="bar" style="width:60%"></div><span class="v money">47.730</span></div>
+            <div class="bar-row"><span class="m">ago</span><div class="bar" style="width:48%"></div><span class="v money">38.180</span></div>
+            <div class="bar-row"><span class="m">set</span><div class="bar" style="width:66%"></div><span class="v money">52.930</span></div>
+            <div class="bar-row"><span class="m">out</span><div class="bar" style="width:74%"></div><span class="v money">59.480</span></div>
+            <div class="bar-row"><span class="m">nov</span><div class="bar" style="width:82%"></div><span class="v money">66.030</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

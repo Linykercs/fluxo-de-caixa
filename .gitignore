@@ -1,0 +1,12 @@
+node_modules/
+dist/
+server/src/generated/
+*.db
+*.db-journal
+.env
+.env.*
+!.env.example
+!.env.production.example
+.tmp-test/
+
+.claude/

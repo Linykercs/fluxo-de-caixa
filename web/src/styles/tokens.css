@@ -1,0 +1,33 @@
+:root {
+  /* Estrutura */
+  --bg: #f4f5f4;
+  --surface: #ffffff;
+  --line: #dde3df;
+
+  /* Texto */
+  --ink: #111a14;
+  --ink-soft: #586358;
+
+  /* Sidebar */
+  --sidebar-bg: #0f2318;
+  --sidebar-active: #1a3d2a;
+  --sidebar-accent: #4ade80;
+  --sidebar-text: #9db8a8;
+
+  /* Accent */
+  --accent: #1b7d4f;
+  --accent-hover: #166040;
+  --accent-light: #e8f5ee;
+
+  /* Semânticos */
+  --green: #166534;
+  --green-bg: #f0fdf4;
+  --red: #b91c1c;
+  --red-bg: #fef2f2;
+  --amber: #92600a;
+  --amber-bg: #fffbeb;
+
+  /* Tipografia */
+  --font-body: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'DM Mono', 'Courier New', monospace;
+}

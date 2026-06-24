@@ -1,0 +1,100 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+.money {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.pos {
+  color: var(--green);
+}
+
+.neg {
+  color: var(--red);
+}
+
+.chip {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-family: var(--font-body);
+}
+
+.chip.open {
+  background: #eef1ee;
+  color: var(--ink-soft);
+}
+
+.chip.overdue {
+  background: var(--red-bg);
+  color: var(--red);
+}
+
+.chip.today {
+  background: var(--amber-bg);
+  color: var(--amber);
+}
+
+.chip.paid {
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+.chip.partial {
+  background: var(--amber-bg);
+  color: var(--amber);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+td.r,
+th.r {
+  text-align: right;
+}
+
+button {
+  font-family: var(--font-body);
+}
+
+a {
+  color: var(--accent);
+}

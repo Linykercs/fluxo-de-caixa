@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guia do FluxoCaixa</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background: #f5f7fa;
+      color: #1a1a2e;
+      line-height: 1.7;
+    }
+
+    /* CAPA */
+    .cover {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 60px 40px;
+      page-break-after: always;
+    }
+    .cover .logo {
+      font-size: 64px;
+      margin-bottom: 24px;
+    }
+    .cover h1 {
+      font-size: 48px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+    .cover .accent {
+      color: #e94560;
+    }
+    .cover p {
+      font-size: 20px;
+      opacity: 0.8;
+      max-width: 500px;
+      margin: 0 auto 48px;
+    }
+    .cover .badge {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 100px;
+      padding: 10px 28px;
+      font-size: 15px;
+      letter-spacing: 1px;
+    }
+
+    /* SUMÁRIO */
+    .toc {
+      background: white;
+      padding: 60px 80px;
+      page-break-after: always;
+      min-height: 100vh;
+    }
+    .toc h2 {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 32px;
+      color: #1a1a2e;
+    }
+    .toc ol {
+      list-style: none;
+      counter-reset: toc;
+    }
+    .toc ol li {
+      counter-increment: toc;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 17px;
+    }
+    .toc ol li::before {
+      content: counter(toc, decimal-leading-zero);
+      font-size: 13px;
+      font-weight: 700;
+      color: #e94560;
+      min-width: 28px;
+    }
+    .toc ol li .toc-icon {
+      font-size: 22px;
+      min-width: 32px;
+    }
+    .toc ol li .toc-title {
+      font-weight: 600;
+    }
+    .toc ol li .toc-desc {
+      color: #888;
+      font-size: 14px;
+      margin-left: auto;
+    }
+
+    /* SEÇÃO */
+    .section {
+      background: white;
+      margin: 0;
+      padding: 60px 80px;
+      page-break-before: always;
+      min-height: 100vh;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      margin-bottom: 40px;
+      padding-bottom: 32px;
+      border-bottom: 3px solid #f0f0f0;
+    }
+    .section-icon {
+      font-size: 56px;
+      line-height: 1;
+    }
+    .section-header-text h2 {
+      font-size: 32px;
+      font-weight: 800;
+      color: #1a1a2e;
+      margin-bottom: 8px;
+    }
+    .section-header-text .tagline {
+      font-size: 17px;
+      color: #666;
+    }
+
+    /* BLOCOS */
+    .card {
+      background: #f8f9fc;
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      border-left: 4px solid #e94560;
+    }
+    .card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #1a1a2e;
+    }
+    .card p, .card li {
+      font-size: 15.5px;
+      color: #444;
+    }
+    .card ul {
+      padding-left: 20px;
+    }
+    .card ul li {
+      margin-bottom: 6px;
+    }
+
+    .card.green  { border-left-color: #22c55e; }
+    .card.blue   { border-left-color: #3b82f6; }
+    .card.purple { border-left-color: #a855f7; }
+    .card.orange { border-left-color: #f97316; }
+    .card.teal   { border-left-color: #14b8a6; }
+    .card.yellow { border-left-color: #eab308; }
+
+    /* EXEMPLO */
+    .example {
+      background: linear-gradient(135deg, #fff7ed, #fef3c7);
+      border: 1px solid #fde68a;
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin: 24px 0;
+    }
+    .example .ex-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #d97706;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .example p {
+      font-size: 15.5px;
+      color: #78350f;
+    }
+
+    /* DICA */
+    .tip {
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      border: 1px solid #bfdbfe;
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin: 20px 0;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .tip .tip-icon { font-size: 22px; flex-shrink: 0; }
+    .tip p { font-size: 15px; color: #1e40af; }
+
+    /* AVISO */
+    .warn {
+      background: linear-gradient(135deg, #fff7ed, #ffedd5);
+      border: 1px solid #fed7aa;
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin: 20px 0;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .warn .warn-icon { font-size: 22px; flex-shrink: 0; }
+    .warn p { font-size: 15px; color: #9a3412; }
+
+    /* PASSO A PASSO */
+    .steps {
+      counter-reset: steps;
+      margin: 24px 0;
+    }
+    .step {
+      counter-increment: steps;
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      align-items: flex-start;
+    }
+    .step::before {
+      content: counter(steps);
+      background: #1a1a2e;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+      min-width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .step p { font-size: 15.5px; color: #333; }
+    .step strong { color: #1a1a2e; }
+
+    /* STATUS CHIPS */
+    .chip {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .chip.red    { background: #fee2e2; color: #991b1b; }
+    .chip.green  { background: #dcfce7; color: #166534; }
+    .chip.yellow { background: #fef9c3; color: #854d0e; }
+    .chip.blue   { background: #dbeafe; color: #1e40af; }
+    .chip.purple { background: #f3e8ff; color: #6b21a8; }
+
+    /* RODAPÉ */
+    footer {
+      background: #1a1a2e;
+      color: rgba(255,255,255,0.6);
+      text-align: center;
+      padding: 32px;
+      font-size: 14px;
+      page-break-before: always;
+    }
+    footer strong { color: white; }
+
+    /* PRINT */
+    @media print {
+      body { background: white; }
+      .section, .cover, .toc { padding: 40px 60px; }
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .mini-card {
+      background: #f8f9fc;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .mini-card .mc-icon { font-size: 36px; margin-bottom: 10px; }
+    .mini-card .mc-title { font-weight: 700; font-size: 15px; color: #1a1a2e; margin-bottom: 6px; }
+    .mini-card .mc-desc { font-size: 13.5px; color: #666; }
+
+    /* TABELA DE PERFIS */
+    .role-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 15px;
+    }
+    .role-table th {
+      background: #1a1a2e;
+      color: white;
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 600;
+    }
+    .role-table td {
+      padding: 11px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      color: #444;
+    }
+    .role-table tr:nth-child(even) td { background: #f8f9fc; }
+  </style>
+</head>
+<body>
+
+<!-- ===================== CAPA ===================== -->
+<div class="cover">
+  <div class="logo">▦</div>
+  <h1>Guia do <span class="accent">FluxoCaixa</span></h1>
+  <p>Tudo o que você precisa saber para controlar as finanças da sua empresa sem complicação.</p>
+  <div class="badge">GUIA DO USUÁRIO</div>
+</div>
+
+<!-- ===================== SUMÁRIO ===================== -->
+<div class="toc">
+  <h2>O que você vai encontrar aqui</h2>
+  <ol>
+    <li>
+      <span class="toc-icon">🏠</span>
+      <span class="toc-title">Painel</span>
+      <span class="toc-desc">Visão geral do caixa e gráfico de fluxo</span>
+    </li>
+    <li>
+      <span class="toc-icon">📤</span>
+      <span class="toc-title">A Pagar</span>
+      <span class="toc-desc">Suas despesas e saídas</span>
+    </li>
+    <li>
+      <span class="toc-icon">📥</span>
+      <span class="toc-title">A Receber</span>
+      <span class="toc-desc">Suas receitas e entradas</span>
+    </li>
+    <li>
+      <span class="toc-icon">🏦</span>
+      <span class="toc-title">Contas Bancárias</span>
+      <span class="toc-desc">SICOOB, caixa e transferências</span>
+    </li>
+    <li>
+      <span class="toc-icon">📄</span>
+      <span class="toc-title">Importar Extrato</span>
+      <span class="toc-desc">Baixar lançamentos pelo extrato</span>
+    </li>
+    <li>
+      <span class="toc-icon">📊</span>
+      <span class="toc-title">Relatórios</span>
+      <span class="toc-desc">DRE, resultado por obra e exportação</span>
+    </li>
+    <li>
+      <span class="toc-icon">🏷️</span>
+      <span class="toc-title">Categorias</span>
+      <span class="toc-desc">Tipos de despesa e receita</span>
+    </li>
+    <li>
+      <span class="toc-icon">🏗️</span>
+      <span class="toc-title">Centros de Custo</span>
+      <span class="toc-desc">Controle por obra</span>
+    </li>
+    <li>
+      <span class="toc-icon">👥</span>
+      <span class="toc-title">Usuários e Perfis</span>
+      <span class="toc-desc">Quem acessa e o que pode fazer</span>
+    </li>
+    <li>
+      <span class="toc-icon">👤</span>
+      <span class="toc-title">Minha Conta</span>
+      <span class="toc-desc">Alterar nome, e-mail e senha</span>
+    </li>
+  </ol>
+</div>
+
+<!-- ===================== 1. PAINEL ===================== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon">🏠</div>
+    <div class="section-header-text">
+      <h2>Painel</h2>
+      <div class="tagline">A primeira tela que você vê ao entrar. Um resumo rápido de tudo.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>O que é o Painel?</h3>
+    <p>O Painel é como o painel de um carro: de relance você vê a velocidade, o combustível e se tem alguma luz de alerta. Aqui você vê quanto dinheiro você tem, o que está para entrar e o que está para sair.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="mini-card">
+      <div class="mc-icon">💰</div>
+      <div class="mc-title">Saldo total</div>
+      <div class="mc-desc">Soma de todas as suas contas bancárias agora mesmo.</div>
+    </div>
+    <div class="mini-card">
+      <div class="mc-icon">📅</div>
+      <div class="mc-title">Vencimentos próximos</div>
+      <div class="mc-desc">O que vence nos próximos dias para você não ser pego de surpresa.</div>
+    </div>
+    <div class="mini-card">
+      <div class="mc-icon">📤</div>
+      <div class="mc-title">Total a pagar</div>
+      <div class="mc-desc">Soma de todas as despesas que ainda não foram pagas.</div>
+    </div>
+    <div class="mini-card">
+      <div class="mc-icon">📥</div>
+      <div class="mc-title">Total a receber</div>
+      <div class="mc-desc">Soma de todas as receitas que ainda não entraram no caixa.</div>
+    </div>
+  </div>
+
+  <div class="card blue">
+    <h3>📈 Gráfico de fluxo de caixa</h3>
+    <p>Logo abaixo dos cards, o Painel exibe um gráfico com os <strong>últimos 6 meses</strong> de movimentação real (baixas efetivadas). O gráfico combina três informações de uma vez:</p>
+    <ul style="margin-top: 12px">
+      <li><strong style="color:#22c55e">Barras verdes</strong> — total de receitas recebidas no mês</li>
+      <li><strong style="color:#e94560">Barras vermelhas</strong> — total de despesas pagas no mês</li>
+      <li><strong style="color:#3b82f6">Linha azul</strong> — resultado do mês (receitas menos despesas)</li>
+    </ul>
+    <p style="margin-top: 12px">Quando a linha azul está acima do zero, o mês fechou positivo. Quando está abaixo, fechou negativo.</p>
+  </div>
+
+  <div class="example">
+    <div class="ex-label">Exemplo prático — Triari</div>
+    <p>Você acessa o sistema na segunda-feira cedo e vê que tem <strong>R$118.000</strong> no SICOOB, <strong>R$47.000</strong> a receber de medições e <strong>R$8.000</strong> em pagamento de mão de obra vencendo essa semana. No gráfico abaixo, você vê que os 3 últimos meses tiveram resultado positivo — e que maio foi o melhor mês do semestre.</p>
+  </div>
+
+  <div class="tip">
+    <div class="tip-icon">💡</div>
+    <p>O Painel não precisa de nenhuma ação sua — é só leitura. Tudo o que aparece lá é resultado do que você cadastrou em A Pagar e A Receber.</p>
+  </div>
+</div>
+
+<!-- ===================== 2. A PAGAR ===================== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon">📤</div>
+    <div class="section-header-text">
+      <h2>A Pagar</h2>
+      <div class="tagline">Todas as despesas da empresa — pagas e a pagar.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>O que é "A Pagar"?</h3>
+    <p>É o caderno de contas a pagar da empresa. Cada despesa é um <strong>lançamento</strong>: você registra antes de pagar, e quando pagar, faz a "baixa" para o sistema saber que saiu do caixa.</p>
+  </div>
+
+  <div class="card green">
+    <h3>Como cadastrar uma despesa</h3>
+    <div class="steps">
+      <div class="step"><p>Clique no botão <strong>"+ Novo lançamento"</strong></p></div>
+      <div class="step"><p>Escolha a <strong>categoria</strong> (ex: Mão de Obra, Material, Simples Nacional)</p></div>
+      <div class="step"><p>Coloque o <strong>fornecedor ou beneficiário</strong> (ex: "Petterson Pedreiro")</p></div>
+      <div class="step"><p>Informe o <strong>valor</strong> e a <strong>data de vencimento</strong></p></div>
+      <div class="step"><p>Se quiser vincular a uma obra, escolha o <strong>Centro de Custo</strong> (ex: Banco do Brasil)</p></div>
+      <div class="step"><p>Salve. O lançamento aparece na lista com status <span class="chip red">Em aberto</span></p></div>
+    </div>
+  </div>
+
+  <div class="card blue">
+    <h3>Como dar baixa (registrar o pagamento)</h3>
+    <p>Quando você pagar a despesa:</p>
+    <div class="steps">
+      <div class="step"><p>Clique no lançamento e escolha <strong>"Dar baixa"</strong></p></div>
+      <div class="step"><p>Informe a <strong>conta bancária</strong> de onde saiu o dinheiro (ex: SICOOB)</p></div>
+      <div class="step"><p>Confirme o <strong>valor pago</strong> e a <strong>data do pagamento</strong></p></div>
+      <div class="step"><p>O status muda para <span class="chip green">Pago</span> e o saldo da conta é atualizado automaticamente</p></div>
+    </div>
+  </div>
+
+  <h3 style="font-size:17px; margin: 28px 0 16px; color:#1a1a2e;">Tipos de lançamento</h3>
+  <div class="two-col">
+    <div class="card" style="margin:0">
+      <h3>🔂 Parcelado</h3>
+      <p>Para despesas divididas em parcelas. Você cadastra uma vez e o sistema cria todas as parcelas automaticamente (ex: 3x de R$2.000).</p>
+    </div>
+    <div class="card purple" style="margin:0">
+      <h3>🔁 Recorrente</h3>
+      <p>Para despesas que se repetem todo mês na mesma data (ex: aluguel do canteiro todo dia 5). Cadastra uma vez e nunca mais esquece.</p>
+    </div>
+  </div>
+
+  <div class="example">
+    <div class="ex-label">Exemplo prático — Triari</div>
+    <p>Você vai pagar R$7.000 de mão de obra para a pintura do Banco do Brasil. Cadastra o lançamento com categoria <em>"Mão de Obra"</em>, beneficiário <em>"Fernando Pintor"</em>, vencimento hoje, centro de custo <em>"Banco do Brasil"</em>. Quando o Pix sair, dá a baixa pelo SICOOB. Pronto — a saída está registrada e o saldo da conta já reflete.</p>
+  </div>
+
+  <div class="tip">
+    <div class="tip-icon">💡</div>
+    <p>Você pode dar baixa com um valor diferente do cadastrado. Útil quando o valor final muda um pouco (desconto, negociação de última hora).</p>
+  </div>
+</div>
+
+<!-- ===================== 3. A RECEBER ===================== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon">📥</div>
+    <div class="section-header-text">
+      <h2>A Receber</h2>
+      <div class="tagline">Suas medições, reembolsos e qualquer dinheiro que está para entrar.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>O que é "A Receber"?</h3>
+    <p>É o caderno de receitas. Tudo o que a empresa vai receber fica aqui: medições de obras, reembolsos de clientes, vendas de material. A lógica é igual ao A Pagar, mas ao contrário — você registra o que vai entrar e dá baixa quando o dinheiro cai na conta.</p>
+  </div>
+
+  <div class="card green">
+    <h3>Como cadastrar uma receita</h3>
+    <div class="steps">
+      <div class="step"><p>Clique em <strong>"+ Novo lançamento"</strong></p></div>
+      <div class="step"><p>Escolha a categoria: <strong>"Receita do Mês"</strong>, <strong>"Reembolso Recebido"</strong>, etc.</p></div>
+      <div class="step"><p>Coloque o <strong>cliente</strong> (ex: "Cafeeira Porta do Céu Ltda")</p></div>
+      <div class="step"><p>Informe o <strong>valor</strong> esperado e a <strong>data prevista</strong> de recebimento</p></div>
+      <div class="step"><p>Vincule à <strong>obra</strong> se quiser (ex: "Paiva")</p></div>
+      <div class="step"><p>Quando o dinheiro entrar, dê a baixa informando a conta e a data</p></div>
+    </div>
+  </div>
+
+  <div class="example">
+    <div class="ex-label">Exemplo prático — Triari</div>
+    <p>A Cafeeira Porta do Céu vai pagar a Medição 14 de R$24.173,55. Você cadastra em A Receber com categoria <em>"Receita do Mês"</em>, cliente <em>"Cafeeira Porta do Céu Ltda"</em> e obra <em>"Banco do Brasil"</em>. Fica com status <span class="chip yellow">Pendente</span>. Quando o depósito cair, você dá baixa e o status vai para <span class="chip green">Recebido</span>.</p>
+  </div>
+
+  <div class="card orange">
+    <h3>Status dos lançamentos</h3>
+    <ul>
+      <li><span class="chip yellow">Pendente</span> — cadastrado mas ainda não recebido</li>
+      <li><span class="chip red">Vencido</span> — passou da data e ainda não entrou</li>
+      <li><span class="chip green">Recebido</span> — baixa feita, dinheiro no caixa</li>
+    </ul>
+  </div>
+
+  <div class="tip">
+    <div class="tip-icon">💡</div>
+    <p>Se um reembolso voltar e depois você precisar devolver, dá para fazer um <strong>estorno</strong> — o sistema desfaz a baixa e o lançamento volta para aberto.</p>
+  </div>
+</div>
+
+<!-- ===================== 4. CONTAS BANCÁRIAS ===================== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon">🏦</div>
+    <div class="section-header-text">
+      <h2>Contas Bancárias</h2>
+      <div class="tagline">Seu SICOOB, caixa e qualquer outra conta, tudo em um só lugar.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Para que serve?</h3>
+    <p>Aqui você vê o saldo de cada conta bancária e o histórico de todas as movimentações — entradas, saídas e transferências. O saldo é calculado automaticamente a partir de cada baixa que você dá em A Pagar e A Receber.</p>
+  </div>
+
+  <div class="card teal">
+    <h3>Extrato da conta</h3>
+    <p>Clicando em uma conta, você vê o extrato completo com todas as movimentações, igual ao extrato do banco — mas com as descrições que você mesmo cadastrou, não aquelas siglas sem sentido do banco.</p>
+  </div>
+
+  <div class="card blue">
+    <h3>Transferência entre contas</h3>
+    <p>Precisa mover dinheiro do SICOOB para o Caixa? Use o botão <strong>"Transferir"</strong>. O sistema desconta de uma conta e credita na outra, sem criar nenhum lançamento em A Pagar ou A Receber.</p>
+    <div class="steps" style="margin-top:16px">
+      <div class="step"><p>Clique em <strong>"Transferir"</strong></p></div>
+      <div class="step"><p>Escolha a conta de <strong>origem</strong> e a de <strong>destino</strong></p></div>
+      <div class="step"><p>Informe o <strong>valor</strong> e a <strong>data</strong></p></div>
+    </div>
+  </div>
+
+  <div class="example">
+    <div class="ex-label">Exemplo prático — Triari</div>
+    <p>Você tem SICOOB com R$118.343 e Caixa com R$110. Precisa pagar um pedreiro em dinheiro. Faz uma transferência de R$2.000 do SICOOB para o Caixa. Agora o Caixa tem R$2.110 e o SICOOB tem R$116.343 — tudo registrado e rastreável.</p>
+  </div>
+
+  <div class="tip">
+    <div class="tip-icon">💡</div>
+    <p>O saldo das contas aparece também na barra lateral esquerda do sistema, então você sempre sabe quanto tem disponível sem precisar entrar nessa aba.</p>
+  </div>
+
+  <div class="warn">
+    <div class="warn-icon">⚠️</div>
+    <p>Criar e editar contas bancárias é uma ação de <strong>Administrador</strong>. Operadores podem consultar saldos e o extrato, mas não alteram configurações.</p>
+  </div>
+</div>
+
+<!-- ===================== 5. IMPORTAR EXTRATO ===================== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon">📄</div>
+    <div class="section-header-text">
+      <h2>Importar Extrato</h2>
+      <div class="tagline">Dê baixa em vários lançamentos de uma vez usando o arquivo do banco.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>O que é isso?</h3>
+    <p>Em vez de dar baixa em cada lançamento manualmente um por um, você pode baixar o extrato do SICOOB no formato <strong>OFX</strong> (um arquivo especial que os bancos disponibilizam) e importar aqui. O sistema cruza automaticamente as transações do banco com os seus lançamentos cadastrados.</p>
+  </div>
+
+  <div class="card green">
+    <h3>Como usar</h3>
+    <div class="steps">
+      <div class="step"><p>Acesse o internet banking do SICOOB e <strong>baixe o extrato em formato OFX</strong> (geralmente em Serviços → Extratos → Exportar)</p></div>
+      <div class="step"><p>No sistema, clique em <strong>"Importar Extrato"</strong> e escolha a conta (SICOOB)</p></div>
+      <div class="step"><p>Selecione o arquivo <strong>.ofx</strong> baixado do banco</p></div>
+      <div class="step"><p>O sistema mostra uma <strong>prévia</strong>: cada transação do banco ao lado do lançamento correspondente que ele encontrou</p></div>
+      <div class="step"><p>Revise, confirme e clique em <strong>"Importar"</strong></p></div>
+    </div>
+  </div>
+
+  <div class="card orange">
+    <h3>O que acontece quando não encontra par?</h3>
+    <p>Se o sistema não achar um lançamento cadastrado para uma transação do banco, ele deixa marcado para você tratar manualmente. Nenhum dado é perdido — você decide o que fazer com cada um.</p>
+  </div>
+
+  <div class="example">
+    <div class="ex-label">Exemplo prático — Triari</div>
+    <p>Na sexta-feira você baixa o extrato da semana do SICOOB. Tem 23 movimentações. Em vez de dar baixa uma por uma, você importa o OFX. O sistema reconhece 19 automaticamente (as medições, os pagamentos de pedreiro, etc.) e deixa 4 para você revisar. Em 5 minutos a semana inteira está fechada.</p>
+  </div>
+
+  <div class="tip">
+    <div class="tip-icon">💡</div>
+    <p>O sistema nunca importa a mesma transação duas vezes. Mesmo se você importar o mesmo arquivo OFX de novo, ele ignora o que já foi processado.</p>
+  </div>
+
+  <div class="warn">
+    <div class="warn-icon">⚠️</div>
+    <p>Confirmar uma importação é uma ação de <strong>Administrador</strong>. Operadores podem visualizar o sistema, mas não confirmam importações de extrato.</p>
+  </div>
+</div>
+
+<!-- ===================== 6. RELATÓRIOS ===================== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon">📊</div>
+    <div class="section-header-text">
+      <h2>Relatórios</h2>
+      <div class="tagline">O resultado da empresa mês a mês — por categoria e por obra — com exportação em PDF e Excel.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>O que são os Relatórios?</h3>
+    <p>É a DRE da empresa (Demonstração de Resultado) apresentada de forma simples. Os Relatórios têm <strong>duas abas</strong>: resultado por categoria e resultado por obra. Em ambas você pode exportar para PDF ou Excel com um clique.</p>
+  </div>
+
+  <div class="card blue">
+    <h3>Aba "Por Categoria" — visão geral do mês</h3>
+    <p>Mostra quanto entrou e saiu no mês selecionado, agrupado por categoria:</p>
+    <ul style="margin-top: 12px">
+      <li>Total de <strong>receitas</strong> (Receita do Mês, Reembolso Recebido...)</li>
+      <li>Total de <strong>despesas</strong> por tipo (Mão de Obra, Material, Simples Nacional...)</li>
+      <li><strong>Resultado</strong> do mês: receitas menos despesas</li>
+      <li>Para cada linha: valor <strong>previsto</strong> (lançamentos cadastrados) × <strong>realizado</strong> (baixas efetivadas)</li>
+    </ul>
+    <p style="margin-top: 12px">Use o histórico de fluxo de caixa anual (acima do DRE) para ver todos os meses do ano em uma tabela só.</p>
+  </div>
+
+  <div class="card teal">
+    <h3>Aba "Por Obra" — resultado por centro de custo</h3>
+    <p>Mostra o mesmo resultado financeiro, mas separado por obra (centro de custo). Para cada obra você vê:</p>
+    <ul style="margin-top: 12px">
+      <li>Total de receitas e despesas da obra no mês</li>
+      <li>Resultado da obra (positivo ou negativo)</li>
+      <li>Clique em uma obra para expandir e ver o detalhamento por categoria</li>
+    </ul>
+    <p style="margin-top: 12px">Lançamentos sem obra ficam agrupados em <em>"Sem centro de custo"</em>.</p>
+  </div>
+
+  <div class="card green">
+    <h3>Exportar para PDF e Excel</h3>
+    <p>Em qualquer aba, clique no botão <strong>"Exportar ▾"</strong> e escolha o formato:</p>
+    <ul style="margin-top: 12px">
+      <li><strong>PDF</strong> — documento formatado, pronto para imprimir ou enviar</li>
+      <li><strong>Excel</strong> — planilha .xlsx para você fazer qualquer análise adicional</li>
+    </ul>
+    <p style="margin-top: 12px">O arquivo é gerado no seu próprio navegador e baixado automaticamente — nada é enviado para fora.</p>
+  </div>
+
+  <div class="card purple">
+    <h3>Fechamento de período</h3>
+    <p>Quando um mês está encerrado e conferido, o Administrador pode <strong>"fechar o mês"</strong>. Isso bloqueia edições nos lançamentos daquele período, protegendo o histórico. Um mês fechado não pode ter lançamentos alterados ou excluídos — só leitura.</p>
+  </div>
+
+  <div class="example">
+    <div class="ex-label">Exemplo prático — Triari</div>
+    <p>Em junho você quer revisar maio. Na aba <em>Por Categoria</em> vê: Receitas R$121.940, Mão de Obra R$111.518, Material R$13.190, Simples Nacional R$1.499, resultado R$20.421 positivo. Troca para a aba <em>Por Obra</em> e vê que o Banco do Brasil contribuiu com R$14.200 e o Paiva com R$6.221. Exporta o PDF para mandar para o sócio. Fecha o mês. Maio protegido.</p>
+  </div>
+
+  <div class="tip">
+    <div class="tip-icon">💡</div>
+    <p>Os Relatórios mostram apenas lançamentos com baixa (pagos/recebidos). Lançamentos em aberto aparecem em A Pagar e A Receber, mas não entram no resultado do mês.</p>
+  </div>
+
+  <div class="warn">
+    <div class="warn-icon">⚠️</div>
+    <p>O botão <strong>"Fechar mês"</strong> só aparece para Administradores. Operadores podem consultar todos os relatórios e exportar, mas não fecham períodos.</p>
+  </div>
+</div>
+
+<!-- ===================== 7. CATEGORIAS ===================== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon">🏷️</div>
+    <div class="section-header-text">
+      <h2>Categorias</h2>
+      <div class="tagline">Os tipos de despesa e receita da empresa. Igual às colunas da sua planilha.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>O que são as Categorias?</h3>
+    <p>Categoria é o <em>tipo</em> de cada lançamento. Quando você cadastra uma despesa de pedreiro, você escolhe a categoria <strong>"Mão de Obra"</strong>. Quando chega uma medição de obra, você escolhe <strong>"Receita do Mês"</strong>. Isso permite que os Relatórios mostrem quanto foi gasto em cada tipo.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="card" style="margin:0">
+      <h3>📤 Categorias de Despesa</h3>
+      <ul>
+        <li>Mão de Obra</li>
+        <li>Material</li>
+        <li>Equipamentos</li>
+        <li>Simples Nacional</li>
+        <li>Folha de Pagamento</li>
+        <li>Contabilidade</li>
+        <li>Retirada de Lucros</li>
+        <li>... e mais</li>
+      </ul>
+    </div>
+    <div class="card green" style="margin:0">
+      <h3>📥 Categorias de Receita</h3>
+      <ul>
+        <li>Receita do Mês</li>
+        <li>Receita Mês Anterior</li>
+        <li>Reembolso Recebido</li>
+        <li>Venda de Material</li>
+        <li>Gratificação</li>
+        <li>Outras Receitas</li>
+        <li>...</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card blue" style="margin-top: 20px">
+    <h3>Como criar uma nova categoria</h3>
+    <div class="steps">
+      <div class="step"><p>Entre em <strong>Categorias</strong> no menu lateral</p></div>
+      <div class="step"><p>Clique em <strong>"+ Nova categoria"</strong></p></div>
+      <div class="step"><p>Digite o nome e escolha se é <strong>Despesa</strong> ou <strong>Receita</strong></p></div>
+      <div class="step"><p>Salve. A categoria já aparece nas opções ao criar um lançamento.</p></div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <div class="tip-icon">💡</div>
+    <p>Não precisa criar muitas categorias logo de cara — as que já estão cadastradas cobrem a maioria dos casos da Triari. Crie novas só quando sentir falta de alguma.</p>
+  </div>
+
+  <div class="warn">
+    <div class="warn-icon">⚠️</div>
+    <p>Criar e editar categorias é uma ação de <strong>Administrador</strong>. Operadores veem as categorias disponíveis e as usam nos lançamentos, mas não criam nem alteram.</p>
+  </div>
+</div>
+
+<!-- ===================== 8. CENTROS DE CUSTO ===================== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon">🏗️</div>
+    <div class="section-header-text">
+      <h2>Centros de Custo</h2>
+      <div class="tagline">Controle financeiro separado por obra. Sabe quanto cada canteiro está custando.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>O que são os Centros de Custo?</h3>
+    <p>Centro de Custo é uma <strong>obra</strong>, um <strong>projeto</strong> ou qualquer agrupamento que você queira acompanhar separado. Na Triari, cada obra é um centro de custo: Banco do Brasil, Paiva, Santa Luzia Gestora, Frigopaiva. Ao cadastrar um lançamento, você pode indicar a qual obra ele pertence.</p>
+  </div>
+
+  <div class="card teal">
+    <h3>Por que usar?</h3>
+    <p>Com o centro de custo preenchido nos lançamentos, você consegue responder perguntas como:</p>
+    <ul>
+      <li>Quanto já foi gasto na obra do Banco do Brasil este mês?</li>
+      <li>Qual obra está consumindo mais em mão de obra?</li>
+      <li>A obra Paiva está dando resultado positivo ou negativo?</li>
+    </ul>
+    <p style="margin-top: 12px">Tudo isso aparece na aba <strong>"Por Obra"</strong> dentro de Relatórios.</p>
+  </div>
+
+  <div class="card green">
+    <h3>Como usar no dia a dia</h3>
+    <div class="steps">
+      <div class="step"><p>Ao criar um lançamento em A Pagar ou A Receber, aparece o campo <strong>"Centro de custo"</strong></p></div>
+      <div class="step"><p>Selecione a obra correspondente (ex: "Banco do Brasil")</p></div>
+      <div class="step"><p>Pronto — aquele lançamento fica vinculado à obra</p></div>
+    </div>
+    <p style="margin-top:12px; color:#444">O campo é <strong>opcional</strong> — despesas gerais (contabilidade, vale transporte) não precisam de obra.</p>
+  </div>
+
+  <div class="example">
+    <div class="ex-label">Exemplo prático — Triari</div>
+    <p>Você paga R$5.314 de mão de obra para a obra Frigopaiva e R$7.000 para o Banco do Brasil. Ambos têm categoria <em>"Mão de Obra"</em>, mas centros de custo diferentes. No relatório <em>Por Obra</em> você vê que a Frigopaiva consumiu R$5.314 e o BB consumiu R$7.000 só em MO — sem misturar.</p>
+  </div>
+
+  <div class="tip">
+    <div class="tip-icon">💡</div>
+    <p>Quando uma obra terminar, você pode arquivar o centro de custo. Ele some do menu de opções mas o histórico fica preservado nos relatórios.</p>
+  </div>
+
+  <div class="warn">
+    <div class="warn-icon">⚠️</div>
+    <p>Criar e editar centros de custo é uma ação de <strong>Administrador</strong>. Qualquer usuário pode vincular lançamentos a uma obra existente.</p>
+  </div>
+</div>
+
+<!-- ===================== 9. USUÁRIOS E PERFIS ===================== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon">👥</div>
+    <div class="section-header-text">
+      <h2>Usuários e Perfis</h2>
+      <div class="tagline">Quem tem acesso ao sistema e o que cada perfil pode fazer.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Dois perfis de acesso</h3>
+    <p>O sistema tem dois perfis: <span class="chip blue">Administrador</span> e <span class="chip purple">Operador</span>. Cada um tem um nível diferente de acesso — assim você pode dar acesso a funcionários sem expor configurações sensíveis.</p>
+  </div>
+
+  <table class="role-table">
+    <tr>
+      <th>Ação</th>
+      <th><span class="chip blue">Administrador</span></th>
+      <th><span class="chip purple">Operador</span></th>
+    </tr>
+    <tr>
+      <td>Ver painel, relatórios, lançamentos</td>
+      <td>✅</td>
+      <td>✅</td>
+    </tr>
+    <tr>
+      <td>Criar e baixar lançamentos (A Pagar / A Receber)</td>
+      <td>✅</td>
+      <td>✅</td>
+    </tr>
+    <tr>
+      <td>Estornar baixas e fazer transferências</td>
+      <td>✅</td>
+      <td>✅</td>
+    </tr>
+    <tr>
+      <td>Exportar PDF e Excel dos relatórios</td>
+      <td>✅</td>
+      <td>✅</td>
+    </tr>
+    <tr>
+      <td>Criar e editar categorias</td>
+      <td>✅</td>
+      <td>❌</td>
+    </tr>
+    <tr>
+      <td>Criar e editar centros de custo</td>
+      <td>✅</td>
+      <td>❌</td>
+    </tr>
+    <tr>
+      <td>Criar e editar contas bancárias</td>
+      <td>✅</td>
+      <td>❌</td>
+    </tr>
+    <tr>
+      <td>Confirmar importação de extrato OFX</td>
+      <td>✅</td>
+      <td>❌</td>
+    </tr>
+    <tr>
+      <td>Fechar mês nos relatórios</td>
+      <td>✅</td>
+      <td>❌</td>
+    </tr>
+    <tr>
+      <td>Criar usuários e gerenciar perfis</td>
+      <td>✅</td>
+      <td>❌</td>
+    </tr>
+  </table>
+
+  <div class="card blue">
+    <h3>Como adicionar um usuário</h3>
+    <div class="steps">
+      <div class="step"><p>Clique em <strong>"+ Novo usuário"</strong></p></div>
+      <div class="step"><p>Digite o <strong>nome completo</strong>, o <strong>e-mail</strong> (será o login) e uma <strong>senha provisória</strong> (mínimo 8 caracteres)</p></div>
+      <div class="step"><p>Escolha o <strong>perfil</strong>: Operador (padrão) ou Administrador</p></div>
+      <div class="step"><p>Salve. A pessoa já pode entrar com o e-mail e a senha.</p></div>
+    </div>
+  </div>
+
+  <div class="card green">
+    <h3>Como mudar o perfil de um usuário</h3>
+    <p>Na lista de usuários, cada linha mostra o perfil atual. Clique em <strong>"Tornar admin"</strong> ou <strong>"Tornar operador"</strong> para alterar na hora. A mudança vale no próximo login do usuário.</p>
+  </div>
+
+  <div class="card orange">
+    <h3>Isolamento por empresa</h3>
+    <p>Cada empresa é completamente separada das outras. O Fabrício (Triari) só vê os dados da Triari. Nenhum dado de uma empresa aparece para outra — mesmo estando no mesmo sistema.</p>
+  </div>
+
+  <div class="example">
+    <div class="ex-label">Exemplo prático — Triari</div>
+    <p>O Fabrício é Administrador — acessa tudo. A secretária Karen precisa lançar despesas do dia a dia, mas não precisa criar categorias nem fechar mês. Você cria um usuário para ela como <strong>Operador</strong>. Ela entra no sistema, vê o painel, cadastra e baixa lançamentos normalmente — mas não vê os menus de Categorias, Contas e Usuários.</p>
+  </div>
+
+  <div class="tip">
+    <div class="tip-icon">💡</div>
+    <p>Não é possível mudar o próprio perfil — um Administrador não consegue se tornar Operador. Isso evita que a empresa fique sem nenhum admin por acidente.</p>
+  </div>
+</div>
+
+<!-- ===================== 10. MINHA CONTA ===================== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon">👤</div>
+    <div class="section-header-text">
+      <h2>Minha Conta</h2>
+      <div class="tagline">Atualize seu nome, e-mail e senha a qualquer momento.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>O que dá para alterar?</h3>
+    <p>Qualquer usuário — independente do perfil — pode atualizar seus próprios dados de acesso: nome de exibição, e-mail de login e senha. Para isso, basta clicar em <strong>"Minha conta"</strong> no menu lateral.</p>
+  </div>
+
+  <div class="card green">
+    <h3>Como alterar a senha</h3>
+    <div class="steps">
+      <div class="step"><p>Acesse <strong>"Minha conta"</strong> no menu lateral</p></div>
+      <div class="step"><p>Digite sua <strong>senha atual</strong> para confirmar que é você</p></div>
+      <div class="step"><p>Digite a <strong>nova senha</strong> (mínimo 8 caracteres)</p></div>
+      <div class="step"><p>Salve. A senha muda imediatamente — use a nova no próximo acesso.</p></div>
+    </div>
+  </div>
+
+  <div class="card blue">
+    <h3>Como alterar o e-mail</h3>
+    <div class="steps">
+      <div class="step"><p>Acesse <strong>"Minha conta"</strong> no menu lateral</p></div>
+      <div class="step"><p>Altere o campo <strong>E-mail</strong> com o novo endereço</p></div>
+      <div class="step"><p>Digite sua <strong>senha atual</strong> para confirmar</p></div>
+      <div class="step"><p>Salve. O novo e-mail será usado para entrar no sistema a partir de agora.</p></div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <div class="tip-icon">💡</div>
+    <p>Você não altera o perfil de acesso (Admin / Operador) pela "Minha conta" — isso é feito pelo Administrador na aba Usuários.</p>
+  </div>
+
+  <div class="warn">
+    <div class="warn-icon">⚠️</div>
+    <p>A senha atual é sempre exigida para qualquer alteração de perfil. Isso garante que ninguém muda seus dados se você esquecer a tela aberta.</p>
+  </div>
+</div>
+
+<!-- ===================== RODAPÉ ===================== -->
+<footer>
+  <p>▦ <strong>FluxoCaixa</strong> &nbsp;·&nbsp; Guia do Usuário &nbsp;·&nbsp; Triari Construtora</p>
+  <p style="margin-top:8px">Dúvidas? Fale com o Linyker.</p>
+</footer>
+
+</body>
+</html>
