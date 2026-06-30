@@ -1,0 +1,9 @@
+# Chromium do sistema para o whatsapp-web.js (servico de WhatsApp nao oficial).
+# PUPPETEER_SKIP_DOWNLOAD evita baixar o Chromium embutido do puppeteer (mais
+# lento e às vezes incompativel com o container); usamos o apt mesmo.
+[phases.setup]
+aptPkgs = ["chromium"]
+
+[variables]
+PUPPETEER_SKIP_DOWNLOAD = "true"
+PUPPETEER_EXECUTABLE_PATH = "/usr/bin/chromium"

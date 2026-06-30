@@ -5,6 +5,11 @@ import { runReminders } from "../src/services/reminders";
 import { settleEntry } from "../src/services/settlements";
 import { createTestDb, makeFixture } from "./helpers/db";
 
+const sendWhatsAppMessage = vi.fn();
+vi.mock("../src/services/whatsapp", () => ({
+  sendWhatsAppMessage: (...args: unknown[]) => sendWhatsAppMessage(...args),
+}));
+
 let db: Awaited<ReturnType<typeof createTestDb>>;
 let fx: Awaited<ReturnType<typeof makeFixture>>;
 
@@ -18,6 +23,8 @@ let sentMessages: { chatId: string; text: string }[];
 
 beforeEach(() => {
   sentMessages = [];
+  sendWhatsAppMessage.mockReset();
+  sendWhatsAppMessage.mockResolvedValue(undefined);
   vi.stubGlobal(
     "fetch",
     vi.fn(async (_url: string, init: RequestInit) => {
@@ -115,5 +122,30 @@ describe("runReminders", () => {
 
     expect(result.messagesSent).toBe(0);
     expect(sentMessages).toHaveLength(0);
+  });
+
+  it("avisa por WhatsApp quando a organização tem número cadastrado", async () => {
+    // já normalizado (com DDI), como fica gravado por setOrganizationPhoneNumber em produção.
+    await db.prisma.organization.update({ where: { id: fx.org.id }, data: { whatsappPhoneNumber: "5511999998888" } });
+    await newEntry("2026-06-01");
+
+    // fx.org já tem telegramChatId desde um teste anterior: os dois canais disparam juntos.
+    const result = await runReminders(db.prisma, "2026-06-01");
+
+    expect(result.messagesSent).toBe(2);
+    expect(sentMessages).toHaveLength(1);
+    expect(sendWhatsAppMessage).toHaveBeenCalledTimes(1);
+    expect(sendWhatsAppMessage).toHaveBeenCalledWith("5511999998888", expect.stringContaining("Vencendo hoje"));
+  });
+
+  it("falha no WhatsApp não impede o envio por Telegram", async () => {
+    sendWhatsAppMessage.mockRejectedValueOnce(new Error("sessão desconectada"));
+    await newEntry("2026-06-15");
+
+    const result = await runReminders(db.prisma, "2026-06-15");
+
+    expect(result.messagesSent).toBe(1);
+    expect(sentMessages).toHaveLength(1);
+    expect(sentMessages[0]!.text).toContain("Vencendo hoje");
   });
 });

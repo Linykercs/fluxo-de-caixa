@@ -37,3 +37,40 @@ export function useTestTelegram() {
     mutationFn: () => apiFetch<{ ok: boolean }>("/notifications/telegram/test", { method: "POST" }),
   });
 }
+
+const WHATSAPP_KEY = ["notifications", "whatsapp"] as const;
+
+export type WhatsAppSessionStatus = "disabled" | "starting" | "qr" | "connected" | "disconnected";
+
+export interface WhatsAppStatus {
+  phoneNumber: string | null;
+  status: WhatsAppSessionStatus;
+  qrDataUrl: string | null;
+}
+
+export function useWhatsAppStatus() {
+  return useQuery({
+    queryKey: WHATSAPP_KEY,
+    queryFn: () => apiFetch<WhatsAppStatus>("/notifications/whatsapp"),
+    // a sessão muda de estado de forma assíncrona (escaneou o QR, conectou etc.)
+    refetchInterval: (query) => (query.state.data?.status === "connected" ? false : 3000),
+  });
+}
+
+export function useSetWhatsAppNumber() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (phoneNumber: string | null) =>
+      apiFetch<{ phoneNumber: string | null }>("/notifications/whatsapp/number", {
+        method: "POST",
+        body: JSON.stringify({ phoneNumber }),
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: WHATSAPP_KEY }),
+  });
+}
+
+export function useTestWhatsApp() {
+  return useMutation({
+    mutationFn: () => apiFetch<{ ok: boolean }>("/notifications/whatsapp/test", { method: "POST" }),
+  });
+}

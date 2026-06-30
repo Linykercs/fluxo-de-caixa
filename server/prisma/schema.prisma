@@ -20,6 +20,7 @@ model Organization {
   closedThroughMonth  String? // "YYYY-MM"; lançamentos com competência <= este mês são bloqueados
   telegramChatId      String? // preenchido quando o /start <token> do bot é confirmado
   telegramLinkToken   String?  @unique // token mostrado na tela de Notificações para o /start
+  whatsappPhoneNumber String? // E.164 (ex: "5511999998888"); sessão do bot é única e global, não por org
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 

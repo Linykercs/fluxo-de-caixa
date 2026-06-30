@@ -1,11 +1,22 @@
-import { useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { ApiError } from "../api/client";
 import {
   useRegenerateTelegramToken,
+  useSetWhatsAppNumber,
   useTelegramStatus,
   useTestTelegram,
+  useTestWhatsApp,
   useUnlinkTelegram,
+  useWhatsAppStatus,
 } from "../api/notifications";
+
+const WHATSAPP_STATUS_LABEL: Record<string, string> = {
+  disabled: "Integração desativada no servidor",
+  starting: "Iniciando sessão…",
+  qr: "Aguardando leitura do QR code",
+  connected: "Conectado",
+  disconnected: "Desconectado",
+};
 
 export function NotificationsPage() {
   const { data: status, isLoading, isError } = useTelegramStatus();
@@ -14,11 +25,34 @@ export function NotificationsPage() {
   const test = useTestTelegram();
   const [testResult, setTestResult] = useState<"ok" | "error" | null>(null);
 
+  const { data: wa, isLoading: waLoading } = useWhatsAppStatus();
+  const setWaNumber = useSetWhatsAppNumber();
+  const testWa = useTestWhatsApp();
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [waTestResult, setWaTestResult] = useState<"ok" | "error" | null>(null);
+
+  useEffect(() => {
+    if (wa) setPhoneNumber(wa.phoneNumber ?? "");
+  }, [wa]);
+
   function handleTest() {
     setTestResult(null);
     test.mutate(undefined, {
       onSuccess: () => setTestResult("ok"),
       onError: () => setTestResult("error"),
+    });
+  }
+
+  function handleSaveNumber(event: FormEvent) {
+    event.preventDefault();
+    setWaNumber.mutate(phoneNumber || null);
+  }
+
+  function handleTestWa() {
+    setWaTestResult(null);
+    testWa.mutate(undefined, {
+      onSuccess: () => setWaTestResult("ok"),
+      onError: () => setWaTestResult("error"),
     });
   }
 
@@ -125,6 +159,77 @@ export function NotificationsPage() {
                     </button>
                   </div>
                 </>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="card">
+          <div className="card-header">
+            <span>Lembretes por WhatsApp (não oficial)</span>
+          </div>
+
+          {waLoading && <div className="empty">Carregando…</div>}
+
+          {wa && (
+            <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 14 }}>
+              <p style={{ margin: 0, color: "#555" }}>
+                Sessão única do servidor (não é por usuário); cadastre aqui o número que deve receber os avisos desta
+                organização.
+              </p>
+
+              {wa.status === "qr" && wa.qrDataUrl && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-start" }}>
+                  <p style={{ margin: 0, fontSize: 14 }}>
+                    Sessão do bot ainda não conectada. Abra o WhatsApp no celular usado pelo bot → Aparelhos
+                    conectados → Conectar um aparelho, e escaneie:
+                  </p>
+                  <img src={wa.qrDataUrl} alt="QR code de conexão do WhatsApp" style={{ width: 220, height: 220 }} />
+                </div>
+              )}
+
+              {wa.status !== "connected" && wa.status !== "qr" && (
+                <div
+                  style={{ color: "#92400e", background: "#fef3c7", borderRadius: 8, padding: "10px 14px", fontSize: 14 }}
+                >
+                  ⚠️ {WHATSAPP_STATUS_LABEL[wa.status] ?? wa.status}
+                </div>
+              )}
+
+              {wa.status === "connected" && (
+                <div
+                  style={{ color: "#166534", background: "#dcfce7", borderRadius: 8, padding: "10px 14px", fontSize: 14 }}
+                >
+                  ✅ Sessão do bot conectada.
+                </div>
+              )}
+
+              <form onSubmit={handleSaveNumber} style={{ display: "flex", gap: 10, alignItems: "flex-end" }}>
+                <label className="field" style={{ flex: 1 }}>
+                  <span>Número (com DDD)</span>
+                  <input
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="(11) 99999-8888"
+                  />
+                </label>
+                <button type="submit" className="btn-primary" disabled={setWaNumber.isPending}>
+                  {setWaNumber.isPending ? "Salvando…" : "Salvar"}
+                </button>
+              </form>
+
+              {wa.phoneNumber && wa.status === "connected" && (
+                <div>
+                  <button type="button" className="btn-link" onClick={handleTestWa} disabled={testWa.isPending}>
+                    {testWa.isPending ? "Enviando…" : "Enviar mensagem de teste"}
+                  </button>
+                  {waTestResult === "ok" && <span style={{ color: "#166534", fontSize: 14, marginLeft: 10 }}>Mensagem enviada!</span>}
+                  {waTestResult === "error" && (
+                    <span style={{ color: "#e94560", fontSize: 14, marginLeft: 10 }}>
+                      {testWa.error instanceof ApiError ? testWa.error.message : "Falha ao enviar."}
+                    </span>
+                  )}
+                </div>
               )}
             </div>
           )}

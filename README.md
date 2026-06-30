@@ -43,6 +43,9 @@ cp server/.env.example server/.env
 | `TELEGRAM_BOT_TOKEN` | Token do bot (ver seção [Notificações via Telegram](#notificações-via-telegram)) | desativado se vazio |
 | `TELEGRAM_BOT_USERNAME` | Username do bot (sem `@`), só pra montar o link de convite | desativado se vazio |
 | `TELEGRAM_WEBHOOK_SECRET` | Segredo na URL do webhook do bot | desativado se vazio |
+| `WHATSAPP_ENABLED` | Liga a sessão do WhatsApp não oficial (ver [Notificações via WhatsApp](#notificações-via-whatsapp-não-oficial)) | `false` |
+| `WHATSAPP_SESSION_PATH` | Onde salvar a sessão logada do WhatsApp | `./.whatsapp-session` |
+| `PUPPETEER_EXECUTABLE_PATH` | Caminho do Chromium do sistema | vazio (auto-detecta em produção) |
 
 ## Banco de dados: migrations e seed
 
@@ -156,6 +159,19 @@ Configuração (uma vez só, feita pelo dono do servidor):
    ```
 
 A partir daí, cada organização vincula o próprio chat sozinha pela tela **Notificações** (menu Administração): basta abrir o link do bot mostrado na tela e tocar em "Iniciar". Sem nenhuma dessas variáveis configuradas, a feature fica simplesmente desativada (o resto do app funciona normal).
+
+## Notificações via WhatsApp (não oficial)
+
+Mesma ideia do Telegram (lembretes 1x/dia, sem duplicar), mas usando [whatsapp-web.js](https://wwebjs.dev) — não é a API oficial da Meta, então não exige verificação de negócio, mas roda como uma sessão real do WhatsApp Web (Chromium headless) e tem risco de banimento do número se usado para muito volume. Diferente do Telegram, é **uma sessão única e global**: um número (escaneado 1x via QR code) manda mensagem para o número que cada organização cadastrar.
+
+Configuração:
+
+1. Garanta que o servidor tem Chromium disponível. Em produção no Railway isso já vem pronto pelo [`nixpacks.toml`](nixpacks.toml) deste repositório (instala via apt e aponta `PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium`); rodando em outro host, instale o Chromium e aponte essa variável manualmente.
+2. Defina `WHATSAPP_ENABLED="true"` e `WHATSAPP_SESSION_PATH` apontando para um caminho persistente (ex: dentro do volume montado, `/data/whatsapp-session`) — sem isso a sessão se perde a cada deploy e pede pra escanear o QR de novo.
+3. Suba o servidor e abra a tela **Notificações** (menu Administração): enquanto a sessão não conecta, ela mostra o QR code ali mesmo. Escaneie com o WhatsApp do número que vai ser o remetente (Aparelhos conectados → Conectar um aparelho).
+4. Cada organização cadastra, na mesma tela, o número (com DDD) que deve receber os avisos dela.
+
+Sem `WHATSAPP_ENABLED="true"` ou sem Chromium disponível, a feature fica desativada e o resto do app funciona normal — os lembretes por Telegram (se configurado) continuam funcionando independente disso.
 
 ## Estrutura do projeto
 
