@@ -487,6 +487,14 @@
   background: #f8faf8;
 }
 
+.entry-table tbody tr.total-row {
+  cursor: default;
+}
+
+.entry-table tbody tr.total-row:hover {
+  background: transparent;
+}
+
 .cell-main {
   font-weight: 600;
 }

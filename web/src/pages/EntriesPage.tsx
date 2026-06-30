@@ -190,6 +190,15 @@ export function EntriesPage({ direction }: EntriesPageProps) {
               </td>
             </tr>
           ))}
+          {!isLoading && !isError && entries && entries.length > 0 && (
+            <tr className="total-row">
+              <td colSpan={5}>
+                Total ({entries.length} lançamento{entries.length === 1 ? "" : "s"})
+              </td>
+              <td className="r money">{formatBRL(entries.reduce((sum, entry) => sum + entry.amountCents, 0))}</td>
+              <td />
+            </tr>
+          )}
         </tbody>
       </table>
 
