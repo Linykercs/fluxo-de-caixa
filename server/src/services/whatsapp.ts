@@ -2,7 +2,6 @@
 // logado manda lembretes para o número cadastrado em cada organização.
 // Diferente do Telegram, não há "vínculo" por organização: o número de
 // destino é só um campo (Organization.whatsappPhoneNumber).
-import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import QRCode from "qrcode";
@@ -22,22 +21,16 @@ let status: WhatsAppStatus = "disabled";
 let qrDataUrl: string | null = null;
 
 // O pacote "chromium" do apt no Ubuntu do nixpacks é só um stub que exige snap
-// (não disponível em container); por isso instalamos via Nix (nixpacks.toml),
-// cujo caminho do binário tem um hash imprevisível — resolvido aqui via `which`.
-// Propositalmente NÃO inclui /usr/bin/chromium-browser nos candidatos fixos:
-// é o stub do apt e parece existir no disco, mas falha ao rodar.
+// (não disponível em container, falha com "requires the chromium snap to be
+// installed"). Por isso NÃO tentamos detectar um Chromium do sistema: só
+// usamos PUPPETEER_EXECUTABLE_PATH se alguém setar explicitamente; sem isso,
+// deixa o puppeteer usar o Chromium que ele mesmo baixa (PUPPETEER_SKIP_DOWNLOAD
+// precisa estar "false" — ver nixpacks.toml).
 function resolveExecutablePath(): string | undefined {
   if (config.puppeteerExecutablePath && existsSync(config.puppeteerExecutablePath)) {
     return config.puppeteerExecutablePath;
   }
-  try {
-    const resolved = execFileSync("which", ["chromium"], { encoding: "utf8" }).trim();
-    if (resolved) return resolved;
-  } catch {
-    // "which" não achou nada no PATH; tenta os caminhos fixos abaixo.
-  }
-  const candidates = ["/usr/bin/chromium", "/usr/bin/google-chrome", "/usr/bin/google-chrome-stable"];
-  return candidates.find((candidate) => existsSync(candidate));
+  return undefined;
 }
 
 /** Inicia a sessão (1x, no boot do servidor). Não-bloqueante: erros só ficam logados. */
@@ -46,16 +39,11 @@ export function initWhatsApp(): void {
     console.warn("[whatsapp] WHATSAPP_ENABLED não é \"true\"; integração desativada.");
     return;
   }
-  const executablePath = resolveExecutablePath();
-  if (!executablePath) {
-    console.error("[whatsapp] Chromium não encontrado (PUPPETEER_EXECUTABLE_PATH). Integração desativada.");
-    return;
-  }
 
   status = "starting";
   client = new Client({
     authStrategy: new LocalAuth({ dataPath: path.resolve(config.whatsappSessionPath) }),
-    puppeteer: { executablePath, args: ["--no-sandbox", "--disable-setuid-sandbox"] },
+    puppeteer: { executablePath: resolveExecutablePath(), args: ["--no-sandbox", "--disable-setuid-sandbox"] },
   });
 
   client.on("qr", (qr) => {

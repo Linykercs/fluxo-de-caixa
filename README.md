@@ -45,7 +45,7 @@ cp server/.env.example server/.env
 | `TELEGRAM_WEBHOOK_SECRET` | Segredo na URL do webhook do bot | desativado se vazio |
 | `WHATSAPP_ENABLED` | Liga a sessão do WhatsApp não oficial (ver [Notificações via WhatsApp](#notificações-via-whatsapp-não-oficial)) | `false` |
 | `WHATSAPP_SESSION_PATH` | Onde salvar a sessão logada do WhatsApp | `./.whatsapp-session` |
-| `PUPPETEER_EXECUTABLE_PATH` | Caminho do Chromium do sistema | vazio (auto-detecta em produção) |
+| `PUPPETEER_EXECUTABLE_PATH` | Caminho de um Chromium específico do sistema (opcional) | vazio (puppeteer baixa o próprio) |
 
 ## Banco de dados: migrations e seed
 
@@ -166,12 +166,12 @@ Mesma ideia do Telegram (lembretes 1x/dia, sem duplicar), mas usando [whatsapp-w
 
 Configuração:
 
-1. Garanta que o servidor tem Chromium disponível. Em produção no Railway isso já vem pronto pelo [`nixpacks.toml`](nixpacks.toml) deste repositório (instala via apt e aponta `PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium`); rodando em outro host, instale o Chromium e aponte essa variável manualmente.
-2. Defina `WHATSAPP_ENABLED="true"` e `WHATSAPP_SESSION_PATH` apontando para um caminho persistente (ex: dentro do volume montado, `/data/whatsapp-session`) — sem isso a sessão se perde a cada deploy e pede pra escanear o QR de novo.
+1. Defina `WHATSAPP_ENABLED="true"` e `WHATSAPP_SESSION_PATH` apontando para um caminho persistente (ex: dentro do volume montado, `/data/whatsapp-session`) — sem isso a sessão se perde a cada deploy e pede pra escanear o QR de novo.
+2. Garanta que o `puppeteer` consegue baixar o próprio Chromium no build (não setar `PUPPETEER_EXECUTABLE_PATH`). O `chromium` instalável via `apt`/Nix em imagens Ubuntu costuma ser só um stub que exige snap — não funciona em container — então o caminho mais confiável é deixar o puppeteer baixar o dele mesmo; ver [`nixpacks.toml`](nixpacks.toml) (`PUPPETEER_SKIP_DOWNLOAD="false"`).
 3. Suba o servidor e abra a tela **Notificações** (menu Administração): enquanto a sessão não conecta, ela mostra o QR code ali mesmo. Escaneie com o WhatsApp do número que vai ser o remetente (Aparelhos conectados → Conectar um aparelho).
 4. Cada organização cadastra, na mesma tela, o número (com DDD) que deve receber os avisos dela.
 
-Sem `WHATSAPP_ENABLED="true"` ou sem Chromium disponível, a feature fica desativada e o resto do app funciona normal — os lembretes por Telegram (se configurado) continuam funcionando independente disso.
+Sem `WHATSAPP_ENABLED="true"`, a feature fica desativada e o resto do app funciona normal — os lembretes por Telegram (se configurado) continuam funcionando independente disso.
 
 ## Estrutura do projeto
 
