@@ -44,6 +44,17 @@ export function initWhatsApp(): void {
   client = new Client({
     authStrategy: new LocalAuth({ dataPath: path.resolve(config.whatsappSessionPath) }),
     puppeteer: { executablePath: resolveExecutablePath(), args: ["--no-sandbox", "--disable-setuid-sandbox"] },
+    // A versão do WhatsApp Web embutida no pacote fica desatualizada rápido e o
+    // WhatsApp passa a recusar a vinculação de novos aparelhos com essa versão
+    // ("Can't link new devices right now"). Busca a versão atual num cache mantido
+    // pela comunidade em vez de usar a bundled. Se a vinculação voltar a falhar
+    // com esse mesmo erro, pegue a versão mais nova em
+    // https://raw.githubusercontent.com/wppconnect-team/wa-version/main/versions.json
+    // (campo "currentVersion") e troque o número abaixo.
+    webVersionCache: {
+      type: "remote",
+      remotePath: "https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.3000.1042411060-alpha.html",
+    },
   });
 
   client.on("qr", (qr) => {
