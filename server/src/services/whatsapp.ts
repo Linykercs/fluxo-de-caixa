@@ -14,11 +14,12 @@ import type { Db } from "../lib/prisma.js";
 
 const { Client, LocalAuth } = WAWebJS;
 
-export type WhatsAppStatus = "disabled" | "starting" | "qr" | "connected" | "disconnected";
+export type WhatsAppStatus = "disabled" | "starting" | "qr" | "code" | "connected" | "disconnected";
 
 let client: WAWebJS.Client | null = null;
 let status: WhatsAppStatus = "disabled";
 let qrDataUrl: string | null = null;
+let pairingCode: string | null = null;
 
 // O pacote "chromium" do apt no Ubuntu do nixpacks é só um stub que exige snap
 // (não disponível em container, falha com "requires the chromium snap to be
@@ -55,10 +56,17 @@ export function initWhatsApp(): void {
       type: "remote",
       remotePath: "https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.3000.1042411060-alpha.html",
     },
+    // Alternativa ao QR: digitar um código de 8 caracteres no celular
+    // (Aparelhos conectados → Vincular com número de telefone). É o número do
+    // CELULAR QUE VAI SER O BOT — não tem relação com o de nenhuma organização.
+    ...(config.whatsappPairingPhoneNumber
+      ? { pairWithPhoneNumber: { phoneNumber: normalizePhoneNumber(config.whatsappPairingPhoneNumber) } }
+      : {}),
   });
 
   client.on("qr", (qr) => {
     status = "qr";
+    pairingCode = null;
     QRCode.toDataURL(qr)
       .then((dataUrl) => {
         qrDataUrl = dataUrl;
@@ -66,15 +74,24 @@ export function initWhatsApp(): void {
       .catch((err) => console.error("[whatsapp] falha ao gerar QR code", err));
   });
 
+  client.on("code", (code) => {
+    status = "code";
+    qrDataUrl = null;
+    pairingCode = code;
+    console.log("[whatsapp] código de pareamento gerado");
+  });
+
   client.on("ready", () => {
     status = "connected";
     qrDataUrl = null;
+    pairingCode = null;
     console.log("[whatsapp] sessão conectada");
   });
 
   client.on("disconnected", (reason) => {
     status = "disconnected";
     qrDataUrl = null;
+    pairingCode = null;
     console.warn("[whatsapp] sessão desconectada", reason);
   });
 
@@ -89,8 +106,12 @@ export function initWhatsApp(): void {
   });
 }
 
-export function getWhatsAppStatus(): { status: WhatsAppStatus; qrDataUrl: string | null } {
-  return { status, qrDataUrl: status === "qr" ? qrDataUrl : null };
+export function getWhatsAppStatus(): { status: WhatsAppStatus; qrDataUrl: string | null; pairingCode: string | null } {
+  return {
+    status,
+    qrDataUrl: status === "qr" ? qrDataUrl : null,
+    pairingCode: status === "code" ? pairingCode : null,
+  };
 }
 
 /** "(11) 99999-8888", "+55 11 99999-8888" etc. → dígitos puros, com DDI 55 se faltar. */

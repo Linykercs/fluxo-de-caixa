@@ -25,4 +25,8 @@ export const config = {
   whatsappEnabled: process.env.WHATSAPP_ENABLED === "true",
   whatsappSessionPath: process.env.WHATSAPP_SESSION_PATH ?? "./.whatsapp-session",
   puppeteerExecutablePath: process.env.PUPPETEER_EXECUTABLE_PATH ?? null,
+  // Se setado, usa pareamento por código (digitado no celular) em vez de QR code
+  // pra vincular a sessão. Esse é o número do CELULAR QUE VAI SER O BOT, não o
+  // de nenhuma organização cliente.
+  whatsappPairingPhoneNumber: process.env.WHATSAPP_PAIRING_PHONE_NUMBER ?? null,
 } as const;

@@ -46,6 +46,7 @@ cp server/.env.example server/.env
 | `WHATSAPP_ENABLED` | Liga a sessão do WhatsApp não oficial (ver [Notificações via WhatsApp](#notificações-via-whatsapp-não-oficial)) | `false` |
 | `WHATSAPP_SESSION_PATH` | Onde salvar a sessão logada do WhatsApp | `./.whatsapp-session` |
 | `PUPPETEER_EXECUTABLE_PATH` | Caminho de um Chromium específico do sistema (opcional) | vazio (puppeteer baixa o próprio) |
+| `WHATSAPP_PAIRING_PHONE_NUMBER` | Vincula por código digitado em vez de QR code; número do celular que vai ser o bot | vazio (usa QR code) |
 
 ## Banco de dados: migrations e seed
 
@@ -170,6 +171,8 @@ Configuração:
 2. Garanta que o `puppeteer` consegue baixar o próprio Chromium no build (não setar `PUPPETEER_EXECUTABLE_PATH`). O `chromium` instalável via `apt`/Nix em imagens Ubuntu costuma ser só um stub que exige snap — não funciona em container — então o caminho mais confiável é deixar o puppeteer baixar o dele mesmo; ver [`nixpacks.toml`](nixpacks.toml) (`PUPPETEER_SKIP_DOWNLOAD="false"`).
 3. Suba o servidor e abra a tela **Notificações** (menu Administração): enquanto a sessão não conecta, ela mostra o QR code ali mesmo. Escaneie com o WhatsApp do número que vai ser o remetente (Aparelhos conectados → Conectar um aparelho).
 4. Cada organização cadastra, na mesma tela, o número (com DDD) que deve receber os avisos dela.
+
+Se o WhatsApp recusar vincular pelo QR ("Can't link new devices right now" — costuma acontecer após várias tentativas seguidas, é bloqueio anti-abuso do próprio WhatsApp), defina `WHATSAPP_PAIRING_PHONE_NUMBER` com o número do celular que vai ser o bot: a tela de Notificações passa a mostrar um código de 8 dígitos pra digitar em **Aparelhos conectados → Vincular com número de telefone**, em vez do QR.
 
 Sem `WHATSAPP_ENABLED="true"`, a feature fica desativada e o resto do app funciona normal — os lembretes por Telegram (se configurado) continuam funcionando independente disso.
 

@@ -40,12 +40,13 @@ export function useTestTelegram() {
 
 const WHATSAPP_KEY = ["notifications", "whatsapp"] as const;
 
-export type WhatsAppSessionStatus = "disabled" | "starting" | "qr" | "connected" | "disconnected";
+export type WhatsAppSessionStatus = "disabled" | "starting" | "qr" | "code" | "connected" | "disconnected";
 
 export interface WhatsAppStatus {
   phoneNumber: string | null;
   status: WhatsAppSessionStatus;
   qrDataUrl: string | null;
+  pairingCode: string | null;
 }
 
 export function useWhatsAppStatus() {

@@ -14,6 +14,7 @@ const WHATSAPP_STATUS_LABEL: Record<string, string> = {
   disabled: "Integração desativada no servidor",
   starting: "Iniciando sessão…",
   qr: "Aguardando leitura do QR code",
+  code: "Aguardando digitação do código de pareamento",
   connected: "Conectado",
   disconnected: "Desconectado",
 };
@@ -188,7 +189,28 @@ export function NotificationsPage() {
                 </div>
               )}
 
-              {wa.status !== "connected" && wa.status !== "qr" && (
+              {wa.status === "code" && wa.pairingCode && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-start" }}>
+                  <p style={{ margin: 0, fontSize: 14 }}>
+                    Sessão do bot ainda não conectada. No celular usado pelo bot: WhatsApp → Aparelhos conectados →
+                    Conectar um aparelho → Vincular com número de telefone, e digite o código:
+                  </p>
+                  <code
+                    style={{
+                      fontSize: 28,
+                      fontWeight: 700,
+                      letterSpacing: 4,
+                      background: "#f4f4f4",
+                      padding: "10px 16px",
+                      borderRadius: 8,
+                    }}
+                  >
+                    {wa.pairingCode}
+                  </code>
+                </div>
+              )}
+
+              {wa.status !== "connected" && wa.status !== "qr" && wa.status !== "code" && (
                 <div
                   style={{ color: "#92400e", background: "#fef3c7", borderRadius: 8, padding: "10px 14px", fontSize: 14 }}
                 >
