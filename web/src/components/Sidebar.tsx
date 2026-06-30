@@ -16,6 +16,7 @@ const NAV_ADMIN = [
   { to: "/categorias", label: "Categorias" },
   { to: "/centros-de-custo", label: "Centros de custo" },
   { to: "/usuarios", label: "Usuários" },
+  { to: "/notificacoes", label: "Notificações" },
 ];
 
 const NAV_ACCOUNT = [

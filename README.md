@@ -40,6 +40,9 @@ cp server/.env.example server/.env
 | `HOST` | Host da API | `127.0.0.1` |
 | `SERVE_WEB` | Servir `web/dist` pelo backend | `false` em dev, `true` em production |
 | `WEB_DIST_PATH` | Caminho do build web para o backend servir | `../web/dist` |
+| `TELEGRAM_BOT_TOKEN` | Token do bot (ver seção [Notificações via Telegram](#notificações-via-telegram)) | desativado se vazio |
+| `TELEGRAM_BOT_USERNAME` | Username do bot (sem `@`), só pra montar o link de convite | desativado se vazio |
+| `TELEGRAM_WEBHOOK_SECRET` | Segredo na URL do webhook do bot | desativado se vazio |
 
 ## Banco de dados: migrations e seed
 
@@ -138,6 +141,21 @@ DATABASE_URL="file:/data/fluxo.db"
 ```
 
 O volume precisa ter backup/snapshot periodico. Se a operacao evoluir para varias empresas/clientes, considere migrar para um banco gerenciado compativel com libSQL/Turso ou reavaliar PostgreSQL.
+
+## Notificações via Telegram
+
+Cada organização pode vincular um chat do Telegram para receber lembretes automáticos de lançamentos vencendo amanhã e vencendo hoje (1x/dia, sem duplicar). Gratuito e funciona para várias organizações ao mesmo tempo, usando um único bot.
+
+Configuração (uma vez só, feita pelo dono do servidor):
+
+1. Crie um bot conversando com [@BotFather](https://t.me/BotFather) no Telegram (`/newbot`) e anote o token e o username.
+2. Defina `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME` e `TELEGRAM_WEBHOOK_SECRET` (qualquer string aleatória, ex: `openssl rand -hex 20`) nas variáveis de ambiente do servidor.
+3. Registre o webhook apontando para a URL pública do servidor:
+   ```bash
+   npm run telegram:set-webhook -w server -- https://seu-dominio.com
+   ```
+
+A partir daí, cada organização vincula o próprio chat sozinha pela tela **Notificações** (menu Administração): basta abrir o link do bot mostrado na tela e tocar em "Iniciar". Sem nenhuma dessas variáveis configuradas, a feature fica simplesmente desativada (o resto do app funciona normal).
 
 ## Estrutura do projeto
 

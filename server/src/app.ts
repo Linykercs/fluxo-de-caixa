@@ -18,8 +18,10 @@ import { categoriesRoutes } from "./routes/categories.js";
 import { costCentersRoutes } from "./routes/cost-centers.js";
 import { dashboardRoutes } from "./routes/dashboard.js";
 import { entriesRoutes } from "./routes/entries.js";
+import { notificationsRoutes } from "./routes/notifications.js";
 import { reportsRoutes } from "./routes/reports.js";
 import { settlementsRoutes } from "./routes/settlements.js";
+import { telegramWebhookRoutes } from "./routes/telegram-webhook.js";
 import { transfersRoutes } from "./routes/transfers.js";
 import { usersRoutes } from "./routes/users.js";
 
@@ -41,6 +43,7 @@ const apiPrefixes = [
   "/dashboard",
   "/reports",
   "/users",
+  "/notifications",
   "/health",
 ];
 
@@ -62,8 +65,10 @@ export function buildApp(opts: BuildAppOptions = {}): FastifyInstance {
   app.get("/health", async () => ({ status: "ok" }));
 
   app.register(authRoutes);
+  // Telegram não manda cookie de sessão; autenticação é o segredo na própria URL (ver rota).
+  app.register(telegramWebhookRoutes);
 
-  // Tudo abaixo exige sessão válida (spec §6: tudo protegido exceto /auth/login).
+  // Tudo abaixo exige sessão válida (spec §6: tudo protegido exceto /auth/login e o webhook do Telegram).
   app.register(async (protectedApp) => {
     protectedApp.addHook("onRequest", async (request) => {
       await request.jwtVerify();
@@ -78,6 +83,7 @@ export function buildApp(opts: BuildAppOptions = {}): FastifyInstance {
     await protectedApp.register(dashboardRoutes);
     await protectedApp.register(reportsRoutes);
     await protectedApp.register(usersRoutes);
+    await protectedApp.register(notificationsRoutes);
   });
 
   if (shouldServeWeb) {

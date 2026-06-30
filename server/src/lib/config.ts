@@ -17,4 +17,7 @@ export const config = {
   isProduction,
   serveWeb: process.env.SERVE_WEB === "true" || isProduction,
   webDistPath: process.env.WEB_DIST_PATH ?? "../web/dist",
+  telegramBotToken: process.env.TELEGRAM_BOT_TOKEN ?? null,
+  telegramWebhookSecret: process.env.TELEGRAM_WEBHOOK_SECRET ?? null,
+  telegramBotUsername: process.env.TELEGRAM_BOT_USERNAME ?? null,
 } as const;

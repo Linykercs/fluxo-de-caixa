@@ -16,7 +16,8 @@
     "db:studio": "prisma studio",
     "org:create": "tsx scripts/create-organization.ts",
     "seed:triari": "tsx scripts/seed-triari.ts",
-    "reset-password": "tsx scripts/reset-password.ts"
+    "reset-password": "tsx scripts/reset-password.ts",
+    "telegram:set-webhook": "tsx scripts/set-telegram-webhook.ts"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.2",

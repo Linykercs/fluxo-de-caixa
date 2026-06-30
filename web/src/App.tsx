@@ -9,6 +9,7 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { EntriesPage } from "./pages/EntriesPage";
 import { ImportStatementPage } from "./pages/ImportStatementPage";
 import { LoginPage } from "./pages/LoginPage";
+import { NotificationsPage } from "./pages/NotificationsPage";
 import { ReportsPage } from "./pages/ReportsPage";
 import { UsersPage } from "./pages/UsersPage";
 import { MeuPerfilPage } from "./pages/MeuPerfilPage";
@@ -31,6 +32,7 @@ export function App() {
             <Route path="/categorias" element={<CategoriesPage />} />
             <Route path="/centros-de-custo" element={<CostCentersPage />} />
             <Route path="/usuarios" element={<UsersPage />} />
+            <Route path="/notificacoes" element={<NotificationsPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/painel" replace />} />
         </Route>

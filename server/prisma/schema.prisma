@@ -15,11 +15,13 @@ datasource db {
 }
 
 model Organization {
-  id                 String   @id @default(cuid())
-  name               String
-  closedThroughMonth String? // "YYYY-MM"; lançamentos com competência <= este mês são bloqueados
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id                  String   @id @default(cuid())
+  name                String
+  closedThroughMonth  String? // "YYYY-MM"; lançamentos com competência <= este mês são bloqueados
+  telegramChatId      String? // preenchido quando o /start <token> do bot é confirmado
+  telegramLinkToken   String?  @unique // token mostrado na tela de Notificações para o /start
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   users        User[]
   bankAccounts BankAccount[]
@@ -115,6 +117,8 @@ model Entry {
   installmentGroupId String?
   installmentNumber  Int?
   installmentTotal   Int?
+  dueSoonNotifiedAt  DateTime? // lembrete "vence amanhã" via Telegram já enviado
+  dueTodayNotifiedAt DateTime? // lembrete "vence hoje" via Telegram já enviado
   deletedAt          DateTime?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
