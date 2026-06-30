@@ -1,9 +1,11 @@
 # Chromium do sistema para o whatsapp-web.js (servico de WhatsApp nao oficial).
-# PUPPETEER_SKIP_DOWNLOAD evita baixar o Chromium embutido do puppeteer (mais
-# lento e às vezes incompativel com o container); usamos o apt mesmo.
+# O pacote "chromium" do apt nesse Ubuntu eh so um stub que exige snap (que
+# nao existe no container), entao usamos o pacote do Nix mesmo (real build
+# standalone). PUPPETEER_SKIP_DOWNLOAD evita baixar o Chromium embutido do
+# puppeteer; o caminho exato do binario do Nix varia (hash no nome), entao
+# o codigo resolve via `which chromium` em runtime (ver services/whatsapp.ts).
 [phases.setup]
-aptPkgs = ["chromium"]
+nixPkgs = ["chromium"]
 
 [variables]
 PUPPETEER_SKIP_DOWNLOAD = "true"
-PUPPETEER_EXECUTABLE_PATH = "/usr/bin/chromium"

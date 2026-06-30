@@ -2,6 +2,7 @@
 // logado manda lembretes para o número cadastrado em cada organização.
 // Diferente do Telegram, não há "vínculo" por organização: o número de
 // destino é só um campo (Organization.whatsappPhoneNumber).
+import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import QRCode from "qrcode";
@@ -20,11 +21,22 @@ let client: WAWebJS.Client | null = null;
 let status: WhatsAppStatus = "disabled";
 let qrDataUrl: string | null = null;
 
+// O pacote "chromium" do apt no Ubuntu do nixpacks é só um stub que exige snap
+// (não disponível em container); por isso instalamos via Nix (nixpacks.toml),
+// cujo caminho do binário tem um hash imprevisível — resolvido aqui via `which`.
+// Propositalmente NÃO inclui /usr/bin/chromium-browser nos candidatos fixos:
+// é o stub do apt e parece existir no disco, mas falha ao rodar.
 function resolveExecutablePath(): string | undefined {
   if (config.puppeteerExecutablePath && existsSync(config.puppeteerExecutablePath)) {
     return config.puppeteerExecutablePath;
   }
-  const candidates = ["/usr/bin/chromium", "/usr/bin/chromium-browser", "/usr/bin/google-chrome"];
+  try {
+    const resolved = execFileSync("which", ["chromium"], { encoding: "utf8" }).trim();
+    if (resolved) return resolved;
+  } catch {
+    // "which" não achou nada no PATH; tenta os caminhos fixos abaixo.
+  }
+  const candidates = ["/usr/bin/chromium", "/usr/bin/google-chrome", "/usr/bin/google-chrome-stable"];
   return candidates.find((candidate) => existsSync(candidate));
 }
 
