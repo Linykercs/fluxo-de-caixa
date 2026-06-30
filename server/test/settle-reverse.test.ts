@@ -27,8 +27,12 @@ function newPayable(amountCents: number) {
   });
 }
 
+// Fixo para não depender da data real: deve ficar antes do dueDate "2026-06-20"
+// usado pelos fixtures deste arquivo, senão entries não baixadas viram OVERDUE.
+const TODAY = "2026-06-12";
+
 async function statusOf(entryId: string) {
-  return deriveEntry(await getEntryOrThrow(db.prisma, fx.org.id, entryId));
+  return deriveEntry(await getEntryOrThrow(db.prisma, fx.org.id, entryId), TODAY);
 }
 
 describe("settleEntry", () => {
