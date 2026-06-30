@@ -5,14 +5,18 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
 import QRCode from "qrcode";
-import { Client, LocalAuth } from "whatsapp-web.js";
+// whatsapp-web.js é CommonJS ("export = "); import nomeado falha em runtime ESM
+// (o cjs-module-lexer do Node não detecta os named exports desse pacote).
+import WAWebJS from "whatsapp-web.js";
 import { config } from "../lib/config.js";
 import { BusinessError } from "../lib/errors.js";
 import type { Db } from "../lib/prisma.js";
 
+const { Client, LocalAuth } = WAWebJS;
+
 export type WhatsAppStatus = "disabled" | "starting" | "qr" | "connected" | "disconnected";
 
-let client: Client | null = null;
+let client: WAWebJS.Client | null = null;
 let status: WhatsAppStatus = "disabled";
 let qrDataUrl: string | null = null;
 
