@@ -6,6 +6,7 @@ import { AccountsPage } from "./pages/AccountsPage";
 import { BudgetsPage } from "./pages/BudgetsPage";
 import { CategoriesPage } from "./pages/CategoriesPage";
 import { CostCentersPage } from "./pages/CostCentersPage";
+import { CounterpartiesPage } from "./pages/CounterpartiesPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { EntriesPage } from "./pages/EntriesPage";
 import { ImportStatementPage } from "./pages/ImportStatementPage";
@@ -33,6 +34,7 @@ export function App() {
             <Route path="/importar-extrato" element={<ImportStatementPage />} />
             <Route path="/categorias" element={<CategoriesPage />} />
             <Route path="/centros-de-custo" element={<CostCentersPage />} />
+            <Route path="/clientes" element={<CounterpartiesPage />} />
             <Route path="/usuarios" element={<UsersPage />} />
             <Route path="/notificacoes" element={<NotificationsPage />} />
           </Route>

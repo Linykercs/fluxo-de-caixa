@@ -44,6 +44,7 @@ function registerDirectionRoutes(app: FastifyInstance, direction: "PAYABLE" | "R
         direction,
         description: input.description,
         counterparty: input.counterparty,
+        counterpartyId: input.counterpartyId,
         notes: input.notes,
         categoryId: input.categoryId,
         costCenterId: input.costCenterId,
@@ -108,6 +109,7 @@ export async function entriesRoutes(app: FastifyInstance) {
     await updateEntry(app.prisma, organizationId, id, {
       description: changes.description,
       counterparty: changes.counterparty,
+      counterpartyId: changes.counterpartyId,
       notes: changes.notes,
       categoryId: changes.categoryId,
       costCenterId: changes.costCenterId,

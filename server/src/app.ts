@@ -16,6 +16,7 @@ import { bankAccountsRoutes } from "./routes/bank-accounts.js";
 import { bankImportRoutes } from "./routes/bank-import.js";
 import { budgetsRoutes } from "./routes/budgets.js";
 import { categoriesRoutes } from "./routes/categories.js";
+import { counterpartiesRoutes } from "./routes/counterparties.js";
 import { costCentersRoutes } from "./routes/cost-centers.js";
 import { dashboardRoutes } from "./routes/dashboard.js";
 import { entriesRoutes } from "./routes/entries.js";
@@ -46,6 +47,7 @@ const apiPrefixes = [
   "/users",
   "/notifications",
   "/budgets",
+  "/counterparties",
   "/health",
 ];
 
@@ -87,6 +89,7 @@ export function buildApp(opts: BuildAppOptions = {}): FastifyInstance {
     await protectedApp.register(usersRoutes);
     await protectedApp.register(notificationsRoutes);
     await protectedApp.register(budgetsRoutes);
+    await protectedApp.register(counterpartiesRoutes);
   });
 
   if (shouldServeWeb) {

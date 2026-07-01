@@ -34,6 +34,7 @@ model Organization {
   movements    Movement[]
   transfers    Transfer[]
   budgets      Budget[]
+  counterparties Counterparty[]
 }
 
 model User {
@@ -110,6 +111,7 @@ model Entry {
   direction          String // "PAYABLE" | "RECEIVABLE"
   description        String
   counterparty       String
+  counterpartyId     String? // opcional: vincula ao cadastro de clientes (spec "cobrança automática")
   notes              String?
   categoryId         String
   costCenterId       String?
@@ -122,21 +124,45 @@ model Entry {
   installmentTotal   Int?
   dueSoonNotifiedAt  DateTime? // lembrete "vence amanhã" via Telegram já enviado
   dueTodayNotifiedAt DateTime? // lembrete "vence hoje" via Telegram já enviado
+  collectionSentAt   DateTime? // cobrança automática pro cliente (RECEIVABLE vencida) já enviada
   deletedAt          DateTime?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
 
-  organization Organization @relation(fields: [organizationId], references: [id])
-  category     Category     @relation(fields: [categoryId], references: [id])
-  costCenter   CostCenter?  @relation(fields: [costCenterId], references: [id])
-  recurrence   Recurrence?  @relation(fields: [recurrenceId], references: [id])
-  settlements  Settlement[]
+  organization    Organization  @relation(fields: [organizationId], references: [id])
+  category        Category      @relation(fields: [categoryId], references: [id])
+  costCenter      CostCenter?   @relation(fields: [costCenterId], references: [id])
+  recurrence      Recurrence?   @relation(fields: [recurrenceId], references: [id])
+  counterpartyRef Counterparty? @relation(fields: [counterpartyId], references: [id])
+  settlements     Settlement[]
 
   @@index([organizationId, competenceMonth])
   @@index([organizationId, dueDate])
   @@index([organizationId, direction])
   @@index([recurrenceId])
   @@index([installmentGroupId])
+  @@index([counterpartyId])
+}
+
+// Cadastro de clientes/fornecedores (spec "cobrança automática"): opcional,
+// só precisa existir se quiser vincular contato (telefone/Telegram) pra
+// cobrança automática de RECEIVABLE vencida. O campo Entry.counterparty
+// (texto livre) continua existindo e funcionando normal sem isso.
+model Counterparty {
+  id                String    @id @default(cuid())
+  organizationId    String
+  name              String
+  phoneNumber       String? // E.164, WhatsApp (ex: "5511999998888")
+  telegramChatId    String? // preenchido quando o /start <token> do cliente é confirmado
+  telegramLinkToken String?   @unique
+  archivedAt        DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  entries      Entry[]
+
+  @@index([organizationId])
 }
 
 model Settlement {

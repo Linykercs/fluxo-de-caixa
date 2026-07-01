@@ -63,22 +63,23 @@ export async function getLinkedChatId(db: Db, organizationId: string): Promise<s
   return organization.telegramChatId;
 }
 
-/** Processa um update recebido no webhook: só reage a "/start <token>". */
-export async function handleTelegramUpdate(db: Db, update: unknown): Promise<void> {
+/**
+ * Processa um update recebido no webhook: só reage a "/start <token>".
+ * Retorna false se não achou organização com esse token (o caller tenta
+ * então casar com um Counterparty, já que os dois usam o mesmo /start).
+ */
+export async function handleTelegramUpdate(db: Db, update: unknown): Promise<boolean> {
   const message = (update as { message?: { text?: string; chat?: { id?: number | string } } }).message;
   const text = message?.text?.trim();
   const chatId = message?.chat?.id;
-  if (!text || chatId === undefined) return;
+  if (!text || chatId === undefined) return false;
 
   const match = /^\/start\s+(\S+)$/.exec(text);
-  if (!match) return;
+  if (!match) return false;
 
   const token = match[1];
   const organization = await db.organization.findUnique({ where: { telegramLinkToken: token } });
-  if (!organization) {
-    await sendTelegramMessage(String(chatId), "Código inválido ou expirado. Gere um novo link na tela de Notificações do FluxoCaixa.");
-    return;
-  }
+  if (!organization) return false;
 
   await db.organization.update({
     where: { id: organization.id },
@@ -88,4 +89,5 @@ export async function handleTelegramUpdate(db: Db, update: unknown): Promise<voi
     String(chatId),
     `Conectado! A partir de agora o FluxoCaixa vai te avisar por aqui sobre os lançamentos de "${organization.name}" perto do vencimento.`,
   );
+  return true;
 }

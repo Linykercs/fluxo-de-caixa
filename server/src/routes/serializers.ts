@@ -29,6 +29,7 @@ export function serializeEntry(entry: EntryWithSettlements, today?: string) {
     direction: entry.direction,
     description: entry.description,
     counterparty: entry.counterparty,
+    counterpartyId: entry.counterpartyId,
     notes: entry.notes,
     categoryId: entry.categoryId,
     costCenterId: entry.costCenterId,

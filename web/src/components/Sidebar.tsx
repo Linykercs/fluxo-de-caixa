@@ -16,6 +16,7 @@ const NAV_ADMIN = [
   { to: "/importar-extrato", label: "Importar extrato" },
   { to: "/categorias", label: "Categorias" },
   { to: "/centros-de-custo", label: "Centros de custo" },
+  { to: "/clientes", label: "Clientes" },
   { to: "/usuarios", label: "Usuários" },
   { to: "/notificacoes", label: "Notificações" },
 ];

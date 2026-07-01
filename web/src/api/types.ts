@@ -51,6 +51,7 @@ export interface Entry {
   direction: EntryDirection;
   description: string;
   counterparty: string;
+  counterpartyId: string | null;
   notes: string | null;
   categoryId: string;
   costCenterId: string | null;
@@ -88,6 +89,17 @@ export interface CostCenter {
   id: string;
   organizationId: string;
   name: string;
+  archivedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Counterparty {
+  id: string;
+  organizationId: string;
+  name: string;
+  phoneNumber: string | null;
+  telegramChatId: string | null;
   archivedAt: string | null;
   createdAt: string;
   updatedAt: string;

@@ -6,6 +6,7 @@ import type { z } from "zod";
 import { ApiError } from "../../api/client";
 import { useCategories } from "../../api/categories";
 import { useCostCenters } from "../../api/cost-centers";
+import { useCounterparties } from "../../api/counterparties";
 import { useCreateEntry } from "../../api/entries";
 import type { EntryDirection } from "../../api/types";
 import { CurrencyInput } from "../CurrencyInput";
@@ -23,6 +24,7 @@ export function SingleEntryForm({ direction, onSuccess }: SingleEntryFormProps) 
   const categoryKind = direction === "PAYABLE" ? "EXPENSE" : "INCOME";
   const { data: categories } = useCategories(categoryKind);
   const { data: costCenters } = useCostCenters();
+  const { data: counterparties } = useCounterparties();
   const createEntry = useCreateEntry(direction);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -31,6 +33,8 @@ export function SingleEntryForm({ direction, onSuccess }: SingleEntryFormProps) 
     control,
     handleSubmit,
     setError,
+    setValue,
+    getValues,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(createSingleEntrySchema),
@@ -38,6 +42,7 @@ export function SingleEntryForm({ direction, onSuccess }: SingleEntryFormProps) 
       kind: "single",
       description: "",
       counterparty: "",
+      counterpartyId: undefined,
       categoryId: "",
       costCenterId: undefined,
       notes: undefined,
@@ -46,6 +51,14 @@ export function SingleEntryForm({ direction, onSuccess }: SingleEntryFormProps) 
       competenceMonth: undefined,
     },
   });
+
+  function handlePickCounterparty(id: string) {
+    setValue("counterpartyId", id || undefined);
+    const picked = counterparties?.find((c) => c.id === id);
+    if (picked && !getValues("counterparty")) {
+      setValue("counterparty", picked.name);
+    }
+  }
 
   function onSubmit(values: FormValues) {
     setFormError(null);
@@ -74,6 +87,18 @@ export function SingleEntryForm({ direction, onSuccess }: SingleEntryFormProps) 
           <label htmlFor="single-counterparty">{counterpartyLabel(direction)}</label>
           <input id="single-counterparty" {...register("counterparty")} />
           {errors.counterparty && <div className="field-error">{errors.counterparty.message}</div>}
+        </div>
+        <div className="field">
+          <label htmlFor="single-counterparty-id">Cliente cadastrado (opcional)</label>
+          <select id="single-counterparty-id" onChange={(e) => handlePickCounterparty(e.target.value)} defaultValue="">
+            <option value="">Nenhum</option>
+            {counterparties?.map((counterparty) => (
+              <option key={counterparty.id} value={counterparty.id}>
+                {counterparty.name}
+              </option>
+            ))}
+          </select>
+          <div className="hint">Vincula pra habilitar cobrança automática se atrasar.</div>
         </div>
         <div className="field">
           <label htmlFor="single-category">Categoria</label>

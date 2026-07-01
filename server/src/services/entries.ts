@@ -61,6 +61,15 @@ export async function assertCategoryMatches(db: Db, organizationId: string, cate
   return category;
 }
 
+/** Se informado, o cliente vinculado precisa pertencer à mesma organização. */
+export async function assertCounterpartyMatches(db: Db, organizationId: string, counterpartyId: string) {
+  const counterparty = await db.counterparty.findFirst({ where: { id: counterpartyId, organizationId } });
+  if (!counterparty) {
+    throw new NotFoundError("COUNTERPARTY_NOT_FOUND", "Cliente não encontrado");
+  }
+  return counterparty;
+}
+
 /** Lançamentos com competência em mês fechado são rejeitados (spec §8/F6). */
 export async function assertPeriodOpen(db: Db, organizationId: string, competenceMonth: string): Promise<void> {
   const closedThroughMonth = await getClosedThroughMonth(db, organizationId);
@@ -140,6 +149,7 @@ export interface CreateSingleEntryInput {
   direction: "PAYABLE" | "RECEIVABLE";
   description: string;
   counterparty: string;
+  counterpartyId?: string | null;
   notes?: string;
   categoryId: string;
   costCenterId?: string | null;
@@ -151,6 +161,7 @@ export interface CreateSingleEntryInput {
 export interface UpdateEntryChanges {
   description?: string;
   counterparty?: string;
+  counterpartyId?: string | null;
   notes?: string | null;
   categoryId?: string;
   costCenterId?: string | null;
@@ -184,6 +195,9 @@ export async function updateEntry(db: Db, organizationId: string, entryId: strin
   }
   if (changes.categoryId !== undefined) {
     await assertCategoryMatches(db, organizationId, changes.categoryId, entry.direction);
+  }
+  if (changes.counterpartyId) {
+    await assertCounterpartyMatches(db, organizationId, changes.counterpartyId);
   }
   return db.entry.update({ where: { id: entry.id }, data: { ...changes } });
 }
@@ -249,6 +263,9 @@ export async function createSingleEntry(db: Db, input: CreateSingleEntryInput) {
     throw new BusinessError("AMOUNT_MUST_BE_POSITIVE", "Valor deve ser maior que zero");
   }
   await assertCategoryMatches(db, input.organizationId, input.categoryId, input.direction);
+  if (input.counterpartyId) {
+    await assertCounterpartyMatches(db, input.organizationId, input.counterpartyId);
+  }
   const competenceMonth = input.competenceMonth ?? competenceOf(input.dueDate);
   await assertPeriodOpen(db, input.organizationId, competenceMonth);
   return db.entry.create({
@@ -257,6 +274,7 @@ export async function createSingleEntry(db: Db, input: CreateSingleEntryInput) {
       direction: input.direction,
       description: input.description,
       counterparty: input.counterparty,
+      counterpartyId: input.counterpartyId,
       notes: input.notes,
       categoryId: input.categoryId,
       costCenterId: input.costCenterId,

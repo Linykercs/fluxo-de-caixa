@@ -14,6 +14,8 @@ export type EntryListQuery = z.infer<typeof entryListQuerySchema>;
 const baseFields = {
   description: z.string().min(1, "Descrição é obrigatória"),
   counterparty: z.string().min(1, "Contraparte é obrigatória"),
+  // opcional: vincula ao cadastro de clientes (habilita a cobrança automática)
+  counterpartyId: z.string().min(1).optional().nullable(),
   notes: z.string().optional(),
   categoryId: z.string().min(1, "Categoria é obrigatória"),
   costCenterId: z.string().min(1).optional().nullable(),
@@ -63,6 +65,7 @@ export const updateEntrySchema = z
   .object({
     description: z.string().min(1).optional(),
     counterparty: z.string().min(1).optional(),
+    counterpartyId: z.string().min(1).optional().nullable(),
     notes: z.string().nullable().optional(),
     categoryId: z.string().min(1).optional(),
     costCenterId: z.string().min(1).optional().nullable(),
