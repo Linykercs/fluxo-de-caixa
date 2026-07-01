@@ -133,6 +133,9 @@
 /* ===== Main content ===== */
 .main {
   padding: 28px 32px;
+  /* sem isso, um filho largo (ex: .table-scroll com tabela em max-content)
+     força o track do grid a crescer em vez de rolar só a tabela */
+  min-width: 0;
 }
 
 .page-head {
@@ -478,6 +481,11 @@
 }
 
 /* ===== Entry table ===== */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .entry-table tbody tr {
   cursor: pointer;
   transition: background 0.1s;
@@ -1053,6 +1061,13 @@ td.money.muted,
     gap: 4px;
   }
 
+  /* Em coluna (desktop) o nav-section já cai na própria linha; em linha
+     (mobile) precisa forçar isso, senão fica espremido no meio dos links. */
+  .sidebar .nav-section {
+    flex-basis: 100%;
+    margin-top: 4px;
+  }
+
   .sidebar nav a {
     padding: 8px 12px;
     border-radius: 6px;
@@ -1092,6 +1107,14 @@ td.money.muted,
 
   .page-head {
     flex-wrap: wrap;
+  }
+
+  /* Sem isso, `table { width: 100% }` força as colunas a encolher e o texto a
+     quebrar em varias linhas; com min-width: 100% + width: max-content a tabela
+     cresce pro tamanho natural do conteudo e rola dentro de .table-scroll. */
+  .table-scroll table {
+    width: max-content;
+    min-width: 100%;
   }
 
   .form-grid,

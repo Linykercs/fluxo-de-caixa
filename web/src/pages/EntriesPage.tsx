@@ -133,74 +133,76 @@ export function EntriesPage({ direction }: EntriesPageProps) {
         </button>
       </div>
 
-      <table className="entry-table">
-        <thead>
-          <tr>
-            <th>Descrição</th>
-            <th>{counterpartyLabel(direction)}</th>
-            <th>Categoria</th>
-            <th>Centro de custo</th>
-            <th>Vencimento</th>
-            <th className="r">Valor</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {isLoading && (
+      <div className="table-scroll">
+        <table className="entry-table">
+          <thead>
             <tr>
-              <td colSpan={7} className="hint">
-                Carregando…
-              </td>
+              <th>Descrição</th>
+              <th>{counterpartyLabel(direction)}</th>
+              <th>Categoria</th>
+              <th>Centro de custo</th>
+              <th>Vencimento</th>
+              <th className="r">Valor</th>
+              <th>Status</th>
             </tr>
-          )}
-          {isError && (
-            <tr>
-              <td colSpan={7} className="hint">
-                Não foi possível carregar os lançamentos.
-              </td>
-            </tr>
-          )}
-          {!isLoading && !isError && entries?.length === 0 && (
-            <tr>
-              <td colSpan={7} className="hint">
-                Nenhum lançamento neste mês.
-              </td>
-            </tr>
-          )}
-          {entries?.map((entry) => (
-            <tr key={entry.id} onClick={() => setModal({ kind: "detail", entryId: entry.id })}>
-              <td>
-                <div className="cell-main">
-                  {entry.description}
-                  {entry.installmentTotal && (
-                    <span className="tag">
-                      {entry.installmentNumber}/{entry.installmentTotal}
-                    </span>
-                  )}
-                  {entry.recurrenceId && <span className="tag">Recorrente</span>}
-                </div>
-              </td>
-              <td>{entry.counterparty}</td>
-              <td>{categories?.find((category) => category.id === entry.categoryId)?.name ?? "—"}</td>
-              <td>{costCenters?.find((costCenter) => costCenter.id === entry.costCenterId)?.name ?? "—"}</td>
-              <td>{formatDate(entry.dueDate)}</td>
-              <td className="r money">{formatBRL(entry.amountCents)}</td>
-              <td>
-                <EntryStatusChip entry={entry} />
-              </td>
-            </tr>
-          ))}
-          {!isLoading && !isError && entries && entries.length > 0 && (
-            <tr className="total-row">
-              <td colSpan={5}>
-                Total ({entries.length} lançamento{entries.length === 1 ? "" : "s"})
-              </td>
-              <td className="r money">{formatBRL(entries.reduce((sum, entry) => sum + entry.amountCents, 0))}</td>
-              <td />
-            </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {isLoading && (
+              <tr>
+                <td colSpan={7} className="hint">
+                  Carregando…
+                </td>
+              </tr>
+            )}
+            {isError && (
+              <tr>
+                <td colSpan={7} className="hint">
+                  Não foi possível carregar os lançamentos.
+                </td>
+              </tr>
+            )}
+            {!isLoading && !isError && entries?.length === 0 && (
+              <tr>
+                <td colSpan={7} className="hint">
+                  Nenhum lançamento neste mês.
+                </td>
+              </tr>
+            )}
+            {entries?.map((entry) => (
+              <tr key={entry.id} onClick={() => setModal({ kind: "detail", entryId: entry.id })}>
+                <td>
+                  <div className="cell-main">
+                    {entry.description}
+                    {entry.installmentTotal && (
+                      <span className="tag">
+                        {entry.installmentNumber}/{entry.installmentTotal}
+                      </span>
+                    )}
+                    {entry.recurrenceId && <span className="tag">Recorrente</span>}
+                  </div>
+                </td>
+                <td>{entry.counterparty}</td>
+                <td>{categories?.find((category) => category.id === entry.categoryId)?.name ?? "—"}</td>
+                <td>{costCenters?.find((costCenter) => costCenter.id === entry.costCenterId)?.name ?? "—"}</td>
+                <td>{formatDate(entry.dueDate)}</td>
+                <td className="r money">{formatBRL(entry.amountCents)}</td>
+                <td>
+                  <EntryStatusChip entry={entry} />
+                </td>
+              </tr>
+            ))}
+            {!isLoading && !isError && entries && entries.length > 0 && (
+              <tr className="total-row">
+                <td colSpan={5}>
+                  Total ({entries.length} lançamento{entries.length === 1 ? "" : "s"})
+                </td>
+                <td className="r money">{formatBRL(entries.reduce((sum, entry) => sum + entry.amountCents, 0))}</td>
+                <td />
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {modal?.kind === "new" && <NewEntryModal direction={direction} onClose={() => setModal(null)} />}
 
