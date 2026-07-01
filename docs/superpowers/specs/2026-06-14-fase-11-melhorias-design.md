@@ -1,9 +1,9 @@
 # Spec — Fase 11: painel, centro de custo, relatórios por mês e DRE
 
 Complementa `docs/superpowers/specs/2026-06-12-fluxo-de-caixa-design.md` (v1, já
-implementada, testada e em produção em
-https://fluxoserver-production.up.railway.app). Esta spec cobre 6 pedidos do
-usuário feitos em 2026-06-14, todos incrementais sobre o app existente.
+implementada, testada e em produção — ver `docs/deploy-railway.md` para a URL atual).
+Esta spec cobre 6 pedidos do usuário feitos em 2026-06-14, todos incrementais sobre o
+app existente.
 
 ## 1. Objetivo
 

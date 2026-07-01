@@ -6,14 +6,14 @@ Guia para hospedar o app (server Fastify + frontend `web/dist` + SQLite) na Rail
 
 ✅ Em produção desde 2026-06-14:
 
-- URL: https://fluxoserver-production.up.railway.app
-- Projeto Railway: "zooming-presence" → ambiente "production" → serviço único
+- URL: gerada pela Railway (Settings → Networking → Generate Domain) — ver painel do
+  projeto para o domínio atual.
+- Projeto Railway: ambiente "production" → serviço único
   `@fluxo/server` (Root Directory = raiz do repo)
 - Volume `@fluxo/server-volume` montado em `/data` (onde mora `fluxo.db`)
 - Seed de demo executado uma vez (`npm run db:seed -w server` via aba Console)
-- Login: `ana@empresa.com.br` / `bruno@empresa.com.br` (dados demo) ou
-  `fabricio@gandour.com.br` (criado depois do seed via `/usuarios`) — senha `senha123`
-  para todos.
+- Login: usuários demo criados pelo seed (ver README) — usuários reais adicionais são
+  criados via `/usuarios` com senha própria, não documentada aqui.
 
 ## Custo esperado
 

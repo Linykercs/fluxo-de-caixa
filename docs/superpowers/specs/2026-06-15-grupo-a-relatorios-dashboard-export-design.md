@@ -3,7 +3,7 @@
 ## Contexto
 
 Sistema FluxoCaixa em produção (Railway + SQLite). Stack: Fastify + Prisma + React.
-Duas organizações ativas: Oficina Criativa e Triari (construtora com 4 obras cadastradas).
+Duas organizações ativas: Oficina Criativa e Vértice Construções (construtora com 4 obras cadastradas).
 
 Funcionalidades aprovadas neste grupo:
 1. **Relatório por obra** — resumo comparativo de centros de custo + detalhe por categoria ao clicar

@@ -3,8 +3,8 @@
 ## 1. Contexto e objetivo
 
 A auditoria completa (ver conversa) identificou que o app está pronto para
-**uma** organização ("Oficina Criativa Ltda", dados demo + usuário real
-`fabricio@gandour.com.br`), mas tem lacunas que bloqueiam onboardar uma
+**uma** organização ("Oficina Criativa Ltda", dados demo + um usuário real),
+mas tem lacunas que bloqueiam onboardar uma
 **segunda organização real** (a empresa do sogro do usuário, 5 funcionários)
 no mesmo banco de produção:
 
@@ -51,7 +51,7 @@ uma segunda organização real em produção, e documentar como criá-la.
   onboarding porque exige uma chamada de API forjada com um ID de outra
   organização (a UI nunca oferece isso).
 - **Nota operacional** (não-código): trocar a senha das contas demo
-  `ana@empresa.com.br` / `bruno@empresa.com.br` / `fabricio@gandour.com.br`
+  `ana@empresa.com.br` / `bruno@empresa.com.br` e da conta do usuário real
   em produção (ou orientar o novo usuário a usar senha forte) antes de
   divulgar a URL para terceiros.
 
@@ -270,7 +270,7 @@ para cadastrar os outros 4 funcionários — sem mudança nessa tela.
 
 - `shared/src/schemas/users.ts`: `password: z.string().min(6).max(120)` →
   `.min(8).max(120)`.
-- `"senha123"` (8 caracteres, usada por `ana`/`bruno`/`fabricio` no seed)
+- `"senha123"` (8 caracteres, usada por `ana`/`bruno` no seed e pelo usuário real)
   continua válida — sem necessidade de migração de dados.
 
 ### 5.3 Guard contra wipe em produção

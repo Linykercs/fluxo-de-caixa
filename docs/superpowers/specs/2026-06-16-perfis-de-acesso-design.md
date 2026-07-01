@@ -2,7 +2,7 @@
 
 ## Contexto
 
-Sistema FluxoCaixa em produção. Atualmente todos os usuários têm acesso total. A Triari precisa dar acesso a funcionários sem expor configurações sensíveis. Dois perfis: **ADMIN** (acesso total) e **OPERATOR** (lançamentos e consultas).
+Sistema FluxoCaixa em produção. Atualmente todos os usuários têm acesso total. Uma das organizações reais precisa dar acesso a funcionários sem expor configurações sensíveis. Dois perfis: **ADMIN** (acesso total) e **OPERATOR** (lançamentos e consultas).
 
 ---
 

@@ -342,7 +342,8 @@ para referencia):
   documentado aqui por seguranca>`, `DATABASE_URL=file:/data/fluxo.db`.
 - Volume `@fluxo/server-volume` montado em `/data`, anexado a `@fluxo/server`.
 - Healthcheck Path: `/health`.
-- Dominio publico: `https://fluxoserver-production.up.railway.app` (TLS automatico).
+- Dominio publico: gerado pela Railway (Networking -> Generate Domain); ver painel do
+  projeto para a URL atual.
 
 Estado do banco em producao:
 
@@ -351,7 +352,7 @@ Estado do banco em producao:
   42 entries, 17 settlements, 19 movements, 2 recorrencias, 1 transferencia. Usuarios
   demo: `ana@empresa.com.br` / `bruno@empresa.com.br`, senha `senha123`.
 - Usuario adicional criado via `POST /users` (mesmo endpoint da tela `/usuarios`), para
-  uso real do dono do projeto: `fabricio@gandour.com.br`, senha `senha123`, mesma
+  uso real do dono do projeto (e-mail e senha nao documentados aqui por seguranca), mesma
   organizacao "Oficina Criativa Ltda" dos dados demo. Login confirmado por curl.
 
 Validacao final (build log Railway):
@@ -376,7 +377,7 @@ Pendente / sugestoes para proxima etapa:
   transfers demo referenciam o `userId` deles - remover exigiria ajustar o seed).
 - Dominio proprio (Networking -> Custom Domain), opcional.
 - `db:seed` apaga e recria os dados demo (`wipe()`); nao rodar de novo em producao real
-  depois que existirem dados de verdade do usuario `fabricio`.
+  depois que existirem dados de verdade do usuario real.
 
 ## Etapa Fase 11 implementada (Claude)
 
