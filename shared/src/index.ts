@@ -10,3 +10,4 @@ export * from "./schemas/categories.js";
 export * from "./schemas/cost-centers.js";
 export * from "./schemas/reports.js";
 export * from "./schemas/organizations.js";
+export * from "./schemas/budgets.js";

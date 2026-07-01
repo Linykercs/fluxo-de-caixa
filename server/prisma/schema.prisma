@@ -33,6 +33,7 @@ model Organization {
   recurrences  Recurrence[]
   movements    Movement[]
   transfers    Transfer[]
+  budgets      Budget[]
 }
 
 model User {
@@ -83,6 +84,7 @@ model Category {
   organization Organization @relation(fields: [organizationId], references: [id])
   entries      Entry[]
   recurrences  Recurrence[]
+  budgets      Budget[]
 
   @@index([organizationId])
 }
@@ -193,6 +195,27 @@ model Recurrence {
   entries      Entry[]
 
   @@index([organizationId])
+}
+
+// Orçamento recorrente por categoria (spec da feature "orçamentos"): igual
+// Recurrence, editar "a partir de um mês" fecha a regra atual (endMonth) e
+// cria uma nova, preservando o valor orçado nos meses passados. Sem
+// materialização em Entry: orçado x realizado é sempre calculado on-the-fly.
+model Budget {
+  id             String    @id @default(cuid())
+  organizationId String
+  categoryId     String
+  amountCents    Int
+  startMonth     String // "YYYY-MM"
+  endMonth       String? // "YYYY-MM"; null = recorrente sem fim definido
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  category     Category     @relation(fields: [categoryId], references: [id])
+
+  @@index([organizationId])
+  @@index([categoryId])
 }
 
 model Movement {

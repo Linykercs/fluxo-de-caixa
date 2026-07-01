@@ -196,6 +196,24 @@ export interface CounterpartySummaryRow {
   realizadoCents: number;
 }
 
+export interface Budget {
+  id: string;
+  categoryId: string;
+  amountCents: number;
+  startMonth: string;
+  endMonth: string | null;
+  category: { name: string; kind: CategoryKind };
+}
+
+export interface BudgetReportRow {
+  categoryId: string;
+  categoryName: string;
+  kind: CategoryKind;
+  budgetId: string | null;
+  budgetedCents: number;
+  actualCents: number;
+}
+
 export interface DreRow {
   categoryId: string;
   categoryName: string;

@@ -14,6 +14,7 @@ import { ValidationError } from "./lib/validation.js";
 import { authRoutes } from "./routes/auth.js";
 import { bankAccountsRoutes } from "./routes/bank-accounts.js";
 import { bankImportRoutes } from "./routes/bank-import.js";
+import { budgetsRoutes } from "./routes/budgets.js";
 import { categoriesRoutes } from "./routes/categories.js";
 import { costCentersRoutes } from "./routes/cost-centers.js";
 import { dashboardRoutes } from "./routes/dashboard.js";
@@ -44,6 +45,7 @@ const apiPrefixes = [
   "/reports",
   "/users",
   "/notifications",
+  "/budgets",
   "/health",
 ];
 
@@ -84,6 +86,7 @@ export function buildApp(opts: BuildAppOptions = {}): FastifyInstance {
     await protectedApp.register(reportsRoutes);
     await protectedApp.register(usersRoutes);
     await protectedApp.register(notificationsRoutes);
+    await protectedApp.register(budgetsRoutes);
   });
 
   if (shouldServeWeb) {

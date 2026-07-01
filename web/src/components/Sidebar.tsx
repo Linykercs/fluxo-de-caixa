@@ -7,6 +7,7 @@ const NAV_MAIN = [
   { to: "/painel", label: "Painel" },
   { to: "/a-pagar", label: "A pagar" },
   { to: "/a-receber", label: "A receber" },
+  { to: "/orcamentos", label: "Orçamentos" },
   { to: "/relatorios", label: "Relatórios" },
 ];
 

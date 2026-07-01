@@ -3,6 +3,7 @@ import { Layout } from "./components/Layout";
 import { RequireAdmin } from "./components/RequireAdmin";
 import { RequireAuth } from "./components/RequireAuth";
 import { AccountsPage } from "./pages/AccountsPage";
+import { BudgetsPage } from "./pages/BudgetsPage";
 import { CategoriesPage } from "./pages/CategoriesPage";
 import { CostCentersPage } from "./pages/CostCentersPage";
 import { DashboardPage } from "./pages/DashboardPage";
@@ -24,6 +25,7 @@ export function App() {
           <Route path="/painel" element={<DashboardPage />} />
           <Route path="/a-pagar" element={<EntriesPage direction="PAYABLE" />} />
           <Route path="/a-receber" element={<EntriesPage direction="RECEIVABLE" />} />
+          <Route path="/orcamentos" element={<BudgetsPage />} />
           <Route path="/relatorios" element={<ReportsPage />} />
           <Route path="/meu-perfil" element={<MeuPerfilPage />} />
           <Route element={<RequireAdmin />}>
