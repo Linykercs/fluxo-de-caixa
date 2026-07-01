@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CreateEntryInput, RecurrenceScopeInput, UpdateEntryInput } from "@fluxo/shared";
 import { apiFetch } from "./client";
 import type { Entry, EntryDetail, EntryDirection, EntryStatus, Recurrence } from "./types";
@@ -31,6 +31,7 @@ export function useEntries(direction: EntryDirection, filters: EntryFilters) {
   return useQuery({
     queryKey: ["entries", direction, filters],
     queryFn: () => apiFetch<Entry[]>(`${PATHS[direction]}${buildQuery(filters)}`),
+    placeholderData: keepPreviousData,
   });
 }
 

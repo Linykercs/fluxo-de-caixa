@@ -30,4 +30,16 @@
   /* Tipografia */
   --font-body: 'DM Sans', system-ui, -apple-system, sans-serif;
   --font-mono: 'DM Mono', 'Courier New', monospace;
+
+  /* Movimento: rápido e discreto, nunca chamativo (é ferramenta de trabalho) */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 0.12s;
+  --duration-base: 0.18s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0.001s;
+    --duration-base: 0.001s;
+  }
 }

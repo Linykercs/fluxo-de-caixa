@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CreateBudgetInput } from "@fluxo/shared";
 import { apiFetch } from "./client";
 import type { Budget, BudgetReportRow } from "./types";
@@ -10,6 +10,7 @@ export function useBudgetReport(month: string) {
   return useQuery({
     queryKey: REPORT_KEY(month),
     queryFn: () => apiFetch<BudgetReportRow[]>(`/budgets/report?month=${month}`),
+    placeholderData: keepPreviousData,
   });
 }
 

@@ -13,6 +13,7 @@ import { EntryStatusChip } from "../components/entries/EntryStatusChip";
 import { NewEntryModal } from "../components/entries/NewEntryModal";
 import { RecurrenceScopeModal } from "../components/entries/RecurrenceScopeModal";
 import { SettleModal } from "../components/entries/SettleModal";
+import { SkeletonRow } from "../components/Skeleton";
 import { counterpartyLabel } from "../lib/counterparty";
 import { addMonths, currentMonth, formatDate, formatMonthLong } from "../lib/dates";
 import { formatBRL } from "../lib/money";
@@ -49,7 +50,7 @@ export function EntriesPage({ direction }: EntriesPageProps) {
   const { data: categories } = useCategories(categoryKind);
   const { data: costCenters } = useCostCenters();
   const { data: accounts } = useBankAccounts();
-  const { data: entries, isLoading, isError } = useEntries(direction, {
+  const { data: entries, isLoading, isFetching, isError } = useEntries(direction, {
     month,
     status: status || undefined,
     categoryId: categoryId || undefined,
@@ -133,7 +134,7 @@ export function EntriesPage({ direction }: EntriesPageProps) {
         </button>
       </div>
 
-      <div className="table-scroll">
+      <div className={isFetching && !isLoading ? "table-scroll is-refetching" : "table-scroll"}>
         <table className="entry-table">
           <thead>
             <tr>
@@ -147,13 +148,10 @@ export function EntriesPage({ direction }: EntriesPageProps) {
             </tr>
           </thead>
           <tbody>
-            {isLoading && (
-              <tr>
-                <td colSpan={7} className="hint">
-                  Carregando…
-                </td>
-              </tr>
-            )}
+            {isLoading &&
+              [0, 1, 2, 3].map((i) => (
+                <SkeletonRow key={i} widths={["70%", "50%", "60%", "50%", 70, 80, 60]} />
+              ))}
             {isError && (
               <tr>
                 <td colSpan={7} className="hint">

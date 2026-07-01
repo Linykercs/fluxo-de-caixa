@@ -2,6 +2,7 @@ import { useSearchParams } from "react-router-dom";
 import { useDashboard } from "../api/dashboard";
 import { useChartReport } from "../api/reports";
 import { CashFlowChart } from "../components/CashFlowChart";
+import { Skeleton } from "../components/Skeleton";
 import {
   addMonths,
   currentMonth,
@@ -18,10 +19,50 @@ const ALERT_CHIPS = {
   soon: { className: "open", label: "7 dias" },
 } as const;
 
+function DashboardSkeleton() {
+  return (
+    <>
+      <div className="page-head">
+        <h2>Painel</h2>
+      </div>
+      <div className="saldo-strip">
+        {[0, 1, 2, 3].map((i) => (
+          <div className="cell" key={i}>
+            <Skeleton width={90} height={11} style={{ marginBottom: 8 }} />
+            <Skeleton width={130} height={20} />
+          </div>
+        ))}
+      </div>
+      <div className="cards-grid">
+        <div className="card">
+          <div className="card-header">
+            <span>Atenção</span>
+          </div>
+          <div style={{ padding: "14px 18px", display: "flex", flexDirection: "column", gap: 14 }}>
+            {[0, 1, 2, 3].map((i) => (
+              <Skeleton key={i} height={13} />
+            ))}
+          </div>
+        </div>
+        <div className="card">
+          <div className="card-header">
+            <span>Projeção de saldo</span>
+          </div>
+          <div style={{ padding: "14px 18px", display: "flex", flexDirection: "column", gap: 14 }}>
+            {[0, 1, 2].map((i) => (
+              <Skeleton key={i} height={13} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
 export function DashboardPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const month = searchParams.get("month") ?? currentMonth();
-  const { data, isLoading, isError } = useDashboard(month);
+  const { data, isLoading, isFetching, isError } = useDashboard(month);
   const { data: chartData } = useChartReport();
 
   function goToMonth(target: string) {
@@ -29,7 +70,7 @@ export function DashboardPage() {
   }
 
   if (isLoading) {
-    return <p>Carregando…</p>;
+    return <DashboardSkeleton />;
   }
 
   if (isError || !data) {
@@ -46,7 +87,7 @@ export function DashboardPage() {
   ];
 
   return (
-    <>
+    <div className={isFetching ? "is-refetching" : undefined}>
       <div className="page-head">
         <h2>Painel</h2>
         <div className="month-nav">
@@ -153,6 +194,6 @@ export function DashboardPage() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
