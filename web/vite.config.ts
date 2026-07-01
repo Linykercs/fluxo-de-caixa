@@ -35,8 +35,8 @@ export default defineConfig({
         short_name: "FluxoCaixa",
         description: "Controle financeiro da sua empresa",
         lang: "pt-BR",
-        theme_color: "#1B7D4F",
-        background_color: "#0b140e",
+        theme_color: "#1E4E8C",
+        background_color: "#0b1420",
         display: "standalone",
         start_url: "/",
         icons: [

@@ -1,6 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
-  <rect width="40" height="40" rx="10" fill="#1B7D4F"/>
-  <!-- Ciclo de fluxo: dois arcos formando um símbolo de circulação (dinheiro entra e sai continuamente) -->
-  <path d="M 21.04 8.04 A 12 12 0 0 1 22.08 31.82" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
-  <path d="M 18.96 31.96 A 12 12 0 0 1 17.92 8.18" stroke="#4ade80" stroke-width="4" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="FluxoCaixa">
+  <rect width="512" height="512" rx="116" fill="#1E4E8C"/>
+  <g fill="none" stroke-width="48" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="#FFFFFF" d="M194 372 L194 140"/>
+    <path stroke="#FFFFFF" d="M150 186 L194 140 L238 186"/>
+    <path stroke="#4FA8FF" d="M318 140 L318 372"/>
+    <path stroke="#4FA8FF" d="M274 326 L318 372 L362 326"/>
+  </g>
 </svg>

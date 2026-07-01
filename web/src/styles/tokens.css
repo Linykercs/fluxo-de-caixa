@@ -9,15 +9,15 @@
   --ink-soft: #586358;
 
   /* Sidebar */
-  --sidebar-bg: #0f2318;
-  --sidebar-active: #1a3d2a;
-  --sidebar-accent: #4ade80;
-  --sidebar-text: #9db8a8;
+  --sidebar-bg: #0b1e33;
+  --sidebar-active: #16324f;
+  --sidebar-accent: #4fa8ff;
+  --sidebar-text: #8fa7c0;
 
   /* Accent */
-  --accent: #1b7d4f;
-  --accent-hover: #166040;
-  --accent-light: #e8f5ee;
+  --accent: #1e4e8c;
+  --accent-hover: #163a69;
+  --accent-light: #e8f0fa;
 
   /* Semânticos */
   --green: #166534;
