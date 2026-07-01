@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { isoDateSchema } from "./common.js";
+import { isoDateSchema, positiveAmountCentsSchema } from "./common.js";
 
 /**
  * POST /transfers — contas iguais não são rejeitadas aqui: o service emite
@@ -8,7 +8,7 @@ import { isoDateSchema } from "./common.js";
 export const createTransferSchema = z.object({
   fromAccountId: z.string().min(1, "Conta de origem é obrigatória"),
   toAccountId: z.string().min(1, "Conta de destino é obrigatória"),
-  amountCents: z.number().int().positive("Valor deve ser maior que zero"),
+  amountCents: positiveAmountCentsSchema("Valor deve ser maior que zero"),
   date: isoDateSchema,
   notes: z.string().optional(),
 });

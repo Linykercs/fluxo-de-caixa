@@ -1,5 +1,5 @@
 // Rodar uma vez (ou de novo se a URL pública mudar):
-//   TELEGRAM_BOT_TOKEN=... TELEGRAM_WEBHOOK_SECRET=... npx tsx scripts/set-telegram-webhook.ts https://fluxoserver-production.up.railway.app
+//   TELEGRAM_BOT_TOKEN=... TELEGRAM_WEBHOOK_SECRET=... npx tsx scripts/set-telegram-webhook.ts https://seu-projeto.up.railway.app
 import "dotenv/config";
 
 const publicUrl = process.argv[2];

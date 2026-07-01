@@ -1,13 +1,20 @@
+import { timingSafeEqual } from "node:crypto";
 import type { FastifyInstance } from "fastify";
 import { config } from "../lib/config.js";
 import * as counterparties from "../services/counterparties.js";
 import { handleTelegramUpdate, sendTelegramMessage } from "../services/telegram.js";
 
+function secretMatches(provided: string, expected: string): boolean {
+  const a = Buffer.from(provided);
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
 // Pública (Telegram não manda cookie de sessão): protegida pelo segredo na própria URL.
 export async function telegramWebhookRoutes(app: FastifyInstance) {
   app.post("/telegram/webhook/:secret", async (request, reply) => {
     const { secret } = request.params as { secret: string };
-    if (!config.telegramWebhookSecret || secret !== config.telegramWebhookSecret) {
+    if (!config.telegramWebhookSecret || !secretMatches(secret, config.telegramWebhookSecret)) {
       return reply.status(404).send();
     }
 

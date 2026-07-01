@@ -74,23 +74,37 @@ export async function runReminders(db: Db, today: string = todaySP()): Promise<R
 
       const openDueToday = dueTodayEntries.filter((entry) => deriveEntry(entry, today).remainingCents > 0);
       const openDueSoon = dueSoonEntries.filter((entry) => deriveEntry(entry, today).remainingCents > 0);
+      // Lançamentos já quitados não precisam de mensagem; marcamos sempre pra
+      // não reavaliar. Os que ainda estão em aberto só são marcados se a
+      // entrega tiver sucesso, senão tentamos de novo na próxima rodada.
+      const settledDueToday = dueTodayEntries.filter((entry) => deriveEntry(entry, today).remainingCents <= 0);
+      const settledDueSoon = dueSoonEntries.filter((entry) => deriveEntry(entry, today).remainingCents <= 0);
 
+      let dueTodaySent = true;
+      let dueSoonSent = true;
       if (openDueToday.length > 0) {
-        messagesSent += await deliver(org, buildMessage("📅 Vencendo hoje:", openDueToday));
+        const sent = await deliver(org, buildMessage("📅 Vencendo hoje:", openDueToday));
+        messagesSent += sent;
+        dueTodaySent = sent > 0;
       }
       if (openDueSoon.length > 0) {
-        messagesSent += await deliver(org, buildMessage("⏰ Vencendo amanhã:", openDueSoon));
+        const sent = await deliver(org, buildMessage("⏰ Vencendo amanhã:", openDueSoon));
+        messagesSent += sent;
+        dueSoonSent = sent > 0;
       }
 
-      if (dueTodayEntries.length > 0) {
+      const dueTodayToMark = settledDueToday.concat(dueTodaySent ? openDueToday : []);
+      const dueSoonToMark = settledDueSoon.concat(dueSoonSent ? openDueSoon : []);
+
+      if (dueTodayToMark.length > 0) {
         await db.entry.updateMany({
-          where: { id: { in: dueTodayEntries.map((entry) => entry.id) } },
+          where: { id: { in: dueTodayToMark.map((entry) => entry.id) } },
           data: { dueTodayNotifiedAt: new Date() },
         });
       }
-      if (dueSoonEntries.length > 0) {
+      if (dueSoonToMark.length > 0) {
         await db.entry.updateMany({
-          where: { id: { in: dueSoonEntries.map((entry) => entry.id) } },
+          where: { id: { in: dueSoonToMark.map((entry) => entry.id) } },
           data: { dueSoonNotifiedAt: new Date() },
         });
       }

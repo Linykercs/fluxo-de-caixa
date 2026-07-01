@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { competenceMonthSchema, entryStatusSchema, isoDateSchema } from "./common.js";
+import {
+  competenceMonthSchema,
+  entryStatusSchema,
+  isoDateSchema,
+  positiveAmountCentsSchema as amountCentsSchema,
+} from "./common.js";
 
 /** Filtros de GET /payables e /receivables. */
 export const entryListQuerySchema = z.object({
@@ -25,7 +30,7 @@ const baseFields = {
 export const createSingleEntrySchema = z.object({
   kind: z.literal("single"),
   ...baseFields,
-  amountCents: z.number().int().positive("Valor deve ser maior que zero"),
+  amountCents: amountCentsSchema("Valor deve ser maior que zero"),
   dueDate: isoDateSchema,
   competenceMonth: competenceMonthSchema.optional(),
 });
@@ -34,7 +39,7 @@ export const createSingleEntrySchema = z.object({
 export const createInstallmentsEntrySchema = z.object({
   kind: z.literal("installments"),
   ...baseFields,
-  totalCents: z.number().int().positive("Valor total deve ser maior que zero"),
+  totalCents: amountCentsSchema("Valor total deve ser maior que zero"),
   installmentTotal: z.number().int().min(2, "Parcelamento exige 2 ou mais parcelas"),
   firstDueDate: isoDateSchema,
   firstCompetenceMonth: competenceMonthSchema,
@@ -47,7 +52,7 @@ export const createRecurrenceEntrySchema = z.object({
   counterparty: z.string().min(1, "Contraparte é obrigatória"),
   categoryId: z.string().min(1, "Categoria é obrigatória"),
   costCenterId: z.string().min(1).optional().nullable(),
-  amountCents: z.number().int().positive("Valor deve ser maior que zero"),
+  amountCents: amountCentsSchema("Valor deve ser maior que zero"),
   dueDay: z.number().int().min(1).max(31),
   startMonth: competenceMonthSchema,
   endMonth: competenceMonthSchema.optional(),
@@ -69,7 +74,7 @@ export const updateEntrySchema = z
     notes: z.string().nullable().optional(),
     categoryId: z.string().min(1).optional(),
     costCenterId: z.string().min(1).optional().nullable(),
-    amountCents: z.number().int().positive("Valor deve ser maior que zero").optional(),
+    amountCents: amountCentsSchema("Valor deve ser maior que zero").optional(),
     dueDate: isoDateSchema.optional(),
     competenceMonth: competenceMonthSchema.optional(),
   })
@@ -83,7 +88,7 @@ export const recurrenceScopeSchema = z.object({
   counterparty: z.string().min(1).optional(),
   categoryId: z.string().min(1).optional(),
   costCenterId: z.string().min(1).optional().nullable(),
-  amountCents: z.number().int().positive("Valor deve ser maior que zero").optional(),
+  amountCents: amountCentsSchema("Valor deve ser maior que zero").optional(),
   dueDay: z.number().int().min(1).max(31).optional(),
 });
 export type RecurrenceScopeInput = z.infer<typeof recurrenceScopeSchema>;

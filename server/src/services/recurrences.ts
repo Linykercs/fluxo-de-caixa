@@ -6,7 +6,7 @@ import { BusinessError, NotFoundError } from "../lib/errors";
 import type { Db } from "../lib/prisma";
 import type { PrismaClient } from "../generated/prisma/client";
 import type { EntryModel, RecurrenceModel } from "../generated/prisma/models";
-import { activeSettlements, assertCategoryMatches, assertPeriodOpen } from "./entries";
+import { activeSettlements, assertCategoryMatches, assertCostCenterMatches, assertPeriodOpen } from "./entries";
 
 export interface CreateRecurrenceInput {
   organizationId: string;
@@ -84,6 +84,9 @@ export async function createRecurrence(prisma: PrismaClient, input: CreateRecurr
     throw new BusinessError("AMOUNT_MUST_BE_POSITIVE", "Valor deve ser maior que zero");
   }
   await assertCategoryMatches(prisma, input.organizationId, input.categoryId, input.direction);
+  if (input.costCenterId) {
+    await assertCostCenterMatches(prisma, input.organizationId, input.costCenterId);
+  }
   await assertPeriodOpen(prisma, input.organizationId, input.startMonth);
 
   return prisma.$transaction(async (tx) => {
@@ -185,6 +188,9 @@ export async function updateRecurrenceFromEntry(
     }
     if (changes.categoryId !== undefined) {
       await assertCategoryMatches(tx, entry.organizationId, changes.categoryId, entry.direction);
+    }
+    if (changes.costCenterId) {
+      await assertCostCenterMatches(tx, entry.organizationId, changes.costCenterId);
     }
 
     const hasActive = activeSettlements(entry.settlements).length > 0;

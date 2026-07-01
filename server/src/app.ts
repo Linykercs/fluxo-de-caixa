@@ -3,6 +3,7 @@ import cors from "@fastify/cors";
 import jwt from "@fastify/jwt";
 import multipart from "@fastify/multipart";
 import rateLimit from "@fastify/rate-limit";
+import helmet from "@fastify/helmet";
 import fastifyStatic from "@fastify/static";
 import Fastify, { type FastifyError, type FastifyInstance } from "fastify";
 import { existsSync } from "node:fs";
@@ -57,10 +58,24 @@ export function buildApp(opts: BuildAppOptions = {}): FastifyInstance {
 
   app.decorate("prisma", opts.prisma ?? defaultPrisma);
 
+  app.register(helmet, {
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
+        imgSrc: ["'self'", "data:"],
+        connectSrc: ["'self'"],
+        manifestSrc: ["'self'"],
+        workerSrc: ["'self'"],
+      },
+    },
+  });
   app.register(rateLimit, { max: 60, timeWindow: "1 minute" });
   app.register(cors, { origin: config.corsOrigin, credentials: true });
   app.register(cookie);
-  app.register(multipart);
+  app.register(multipart, { limits: { fileSize: 10 * 1024 * 1024 } });
   app.register(jwt, {
     secret: config.jwtSecret,
     cookie: { cookieName: config.cookieName, signed: false },

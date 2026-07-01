@@ -70,6 +70,15 @@ export async function assertCounterpartyMatches(db: Db, organizationId: string, 
   return counterparty;
 }
 
+/** Se informado, o centro de custo precisa pertencer à mesma organização. */
+export async function assertCostCenterMatches(db: Db, organizationId: string, costCenterId: string) {
+  const costCenter = await db.costCenter.findFirst({ where: { id: costCenterId, organizationId } });
+  if (!costCenter) {
+    throw new NotFoundError("COST_CENTER_NOT_FOUND", "Centro de custo não encontrado");
+  }
+  return costCenter;
+}
+
 /** Lançamentos com competência em mês fechado são rejeitados (spec §8/F6). */
 export async function assertPeriodOpen(db: Db, organizationId: string, competenceMonth: string): Promise<void> {
   const closedThroughMonth = await getClosedThroughMonth(db, organizationId);
@@ -109,6 +118,9 @@ export async function createInstallments(db: Db, input: CreateInstallmentsInput)
     );
   }
   await assertCategoryMatches(db, input.organizationId, input.categoryId, input.direction);
+  if (input.costCenterId) {
+    await assertCostCenterMatches(db, input.organizationId, input.costCenterId);
+  }
   for (let i = 0; i < n; i++) {
     await assertPeriodOpen(db, input.organizationId, addMonths(input.firstCompetenceMonth, i));
   }
@@ -199,6 +211,9 @@ export async function updateEntry(db: Db, organizationId: string, entryId: strin
   if (changes.counterpartyId) {
     await assertCounterpartyMatches(db, organizationId, changes.counterpartyId);
   }
+  if (changes.costCenterId) {
+    await assertCostCenterMatches(db, organizationId, changes.costCenterId);
+  }
   return db.entry.update({ where: { id: entry.id }, data: { ...changes } });
 }
 
@@ -265,6 +280,9 @@ export async function createSingleEntry(db: Db, input: CreateSingleEntryInput) {
   await assertCategoryMatches(db, input.organizationId, input.categoryId, input.direction);
   if (input.counterpartyId) {
     await assertCounterpartyMatches(db, input.organizationId, input.counterpartyId);
+  }
+  if (input.costCenterId) {
+    await assertCostCenterMatches(db, input.organizationId, input.costCenterId);
   }
   const competenceMonth = input.competenceMonth ?? competenceOf(input.dueDate);
   await assertPeriodOpen(db, input.organizationId, competenceMonth);

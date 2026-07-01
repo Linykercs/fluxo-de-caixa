@@ -15,7 +15,10 @@ export async function sendTelegramMessage(chatId: string, text: string): Promise
   const res = await fetch(botApiUrl("sendMessage"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML" }),
+    // Sem parse_mode: os textos são montados com descrição/nome digitados
+    // pelo usuário, e um "<"/"&" nesses campos quebraria o parser de entidades
+    // do Telegram se usássemos HTML/Markdown (a API rejeita a mensagem inteira).
+    body: JSON.stringify({ chat_id: chatId, text }),
   });
   if (!res.ok) {
     const body = await res.text().catch(() => "");

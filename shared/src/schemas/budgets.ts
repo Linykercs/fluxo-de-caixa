@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { competenceMonthSchema } from "./common.js";
+import { competenceMonthSchema, positiveAmountCentsSchema } from "./common.js";
 
 /** GET /budgets/report?month= */
 export const budgetReportQuerySchema = z.object({
@@ -10,7 +10,7 @@ export type BudgetReportQuery = z.infer<typeof budgetReportQuerySchema>;
 /** POST /budgets */
 export const createBudgetSchema = z.object({
   categoryId: z.string().min(1),
-  amountCents: z.number().int().positive(),
+  amountCents: positiveAmountCentsSchema("Valor deve ser maior que zero"),
   startMonth: competenceMonthSchema,
   endMonth: competenceMonthSchema.optional(),
 });
@@ -18,7 +18,7 @@ export type CreateBudgetInput = z.infer<typeof createBudgetSchema>;
 
 /** PATCH /budgets/:id — muda o valor a partir de effectiveMonth. */
 export const updateBudgetSchema = z.object({
-  amountCents: z.number().int().positive(),
+  amountCents: positiveAmountCentsSchema("Valor deve ser maior que zero"),
   effectiveMonth: competenceMonthSchema,
 });
 export type UpdateBudgetInput = z.infer<typeof updateBudgetSchema>;

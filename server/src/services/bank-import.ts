@@ -43,12 +43,18 @@ export async function previewImport(prisma: PrismaClient, params: PreviewImportP
     include: { settlements: true },
   });
 
+  const existingFitids = new Set(
+    (
+      await prisma.settlement.findMany({
+        where: { bankAccountId, importFitid: { in: transactions.map((t) => t.fitid) } },
+        select: { importFitid: true },
+      })
+    ).map((s) => s.importFitid),
+  );
+
   const rows: ImportPreviewRow[] = [];
   for (const txn of transactions) {
-    const existing = await prisma.settlement.findFirst({
-      where: { bankAccountId, importFitid: txn.fitid },
-    });
-    if (existing) {
+    if (existingFitids.has(txn.fitid)) {
       rows.push({ ...txn, status: "duplicate", candidates: [] });
       continue;
     }

@@ -88,11 +88,17 @@ export async function runCollections(db: Db, today: string = todaySP()): Promise
     string,
     { counterparty: NotifiableCounterparty; entries: (OverdueEntryForMessage & { id: string })[] }
   >();
+  const processedEntryIds: string[] = [];
 
   for (const entry of overdueEntries) {
     if (!entry.counterpartyRef) continue;
     if (deriveEntry(entry, today).remainingCents <= 0) continue;
-    if (!entry.counterpartyRef.telegramChatId && !entry.counterpartyRef.phoneNumber) continue;
+    if (!entry.counterpartyRef.telegramChatId && !entry.counterpartyRef.phoneNumber) {
+      // Sem canal configurado: nunca vai ser possível entregar, então marca
+      // como processado pra não ficar reavaliando o mesmo lançamento à toa.
+      processedEntryIds.push(entry.id);
+      continue;
+    }
 
     const bucket = openByCounterparty.get(entry.counterpartyRef.id) ?? {
       counterparty: entry.counterpartyRef,
@@ -106,18 +112,21 @@ export async function runCollections(db: Db, today: string = todaySP()): Promise
   for (const { counterparty, entries } of openByCounterparty.values()) {
     try {
       const text = buildCollectionMessage(counterparty.name, entries);
-      messagesSent += await deliver(counterparty, text);
+      const sent = await deliver(counterparty, text);
+      messagesSent += sent;
+      // Só marca como processado se a entrega teve sucesso em pelo menos um
+      // canal; se falhar (ex: Telegram fora do ar), tenta de novo na próxima rodada.
+      if (sent > 0) {
+        processedEntryIds.push(...entries.map((e) => e.id));
+      }
     } catch (err) {
       console.error(`[collections] falha ao processar cliente ${counterparty.id}`, err);
     }
   }
 
-  // Marca TODAS as vencidas com cliente vinculado como processadas nessa rodada
-  // (mesmo as que não geraram mensagem, ex: cliente sem canal configurado),
-  // pra não ficar reavaliando o mesmo lançamento toda hora.
-  if (overdueEntries.length > 0) {
+  if (processedEntryIds.length > 0) {
     await db.entry.updateMany({
-      where: { id: { in: overdueEntries.map((entry) => entry.id) } },
+      where: { id: { in: processedEntryIds } },
       data: { collectionSentAt: new Date() },
     });
   }

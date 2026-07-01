@@ -1,10 +1,10 @@
 import { z } from "zod";
-import { isoDateSchema } from "./common.js";
+import { isoDateSchema, MAX_AMOUNT_CENTS } from "./common.js";
 
 const rowBaseFields = {
   fitid: z.string().min(1),
   date: isoDateSchema,
-  amountCents: z.number().int(),
+  amountCents: z.number().int().min(-MAX_AMOUNT_CENTS).max(MAX_AMOUNT_CENTS, "Valor excede o limite permitido"),
   description: z.string(),
 };
 
