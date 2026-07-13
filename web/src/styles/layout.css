@@ -1471,9 +1471,80 @@ td.money.muted,
     gap: 8px;
   }
 
+  /* Toque: campos com 16px (iOS não dá zoom) e alvos de pelo menos 44px */
+  .field input,
+  .field select,
+  .field textarea,
+  .toolbar select,
+  .card-header select,
+  .import-dest select,
+  .import-create-fields select,
+  .import-create-fields input {
+    font-size: 16px;
+    min-height: 44px;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger,
+  .tab-btn,
+  .tabs button,
+  .month-nav button,
+  .sidebar .logout button {
+    min-height: 44px;
+  }
+
+  .month-nav button {
+    min-width: 44px;
+  }
+
+  .btn-link {
+    padding: 10px 4px;
+  }
+
+  .inline-confirm .btn-link {
+    padding: 10px 8px;
+  }
+
+  /* Modal em tela cheia: header fixo, corpo rolável, ações em coluna
+     com a primária por último (perto do polegar) */
   .modal {
-    max-height: 100vh;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: 100dvh;
     border-radius: 0;
+  }
+
+  .modal-close {
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 24px;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+  }
+
+  .modal-footer .btn-primary,
+  .modal-footer .btn-secondary,
+  .modal-footer .btn-danger {
+    width: 100%;
+  }
+
+  .detail-actions .btn-primary,
+  .detail-actions .btn-secondary,
+  .detail-actions .btn-danger {
+    flex: 1 1 45%;
+    min-height: 44px;
+  }
+
+  /* Confirmação (modal-sm) continua um diálogo curto centrado */
+  .modal.modal-sm {
+    height: auto;
+    max-height: 85dvh;
+    width: calc(100% - 32px);
+    border-radius: 14px;
   }
 
   .modal-overlay {
