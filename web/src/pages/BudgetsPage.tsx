@@ -14,7 +14,7 @@ function ProgressBar({ row }: { row: BudgetReportRow }) {
   const pct = Math.round((row.actualCents / row.budgetedCents) * 100);
   const over = row.actualCents > row.budgetedCents;
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
       <div style={{ flex: 1, height: 8, background: "var(--neutral-bg)", borderRadius: 4, overflow: "hidden" }}>
         <div
           style={{
@@ -38,7 +38,7 @@ function BudgetSection({ kind, rows, onEdit }: { kind: CategoryKind; rows: Budge
       <div className="card-header">
         <span>{KIND_LABEL[kind]}</span>
       </div>
-      <table>
+      <table className="stack-mobile">
         <thead>
           <tr>
             <th>Categoria</th>
@@ -52,9 +52,9 @@ function BudgetSection({ kind, rows, onEdit }: { kind: CategoryKind; rows: Budge
           {rows.map((row) => (
             <tr key={row.categoryId}>
               <td>{row.categoryName}</td>
-              <td className="r money">{row.budgetedCents > 0 ? formatBRL(row.budgetedCents) : "—"}</td>
-              <td className="r money">{formatBRL(row.actualCents)}</td>
-              <td>
+              <td className="r money" data-label="Orçado">{row.budgetedCents > 0 ? formatBRL(row.budgetedCents) : "—"}</td>
+              <td className="r money" data-label="Realizado">{formatBRL(row.actualCents)}</td>
+              <td data-label="Progresso">
                 <ProgressBar row={row} />
               </td>
               {isAdmin && (

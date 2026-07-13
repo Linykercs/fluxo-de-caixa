@@ -247,6 +247,7 @@ export function ImportStatementPage() {
               <div className="empty">O extrato não contém transações.</div>
             ) : (
               <>
+                <div className="table-scroll sticky-first">
                 <table>
                   <thead>
                     <tr>
@@ -269,6 +270,7 @@ export function ImportStatementPage() {
                     ))}
                   </tbody>
                 </table>
+                </div>
 
                 <div className="card-footer">
                   <div className="card-footer-row">

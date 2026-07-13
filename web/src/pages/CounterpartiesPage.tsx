@@ -40,7 +40,7 @@ export function CounterpartiesPage() {
             <div className="empty">Nenhum cliente cadastrado.</div>
           ) : (
             <div className="table-scroll">
-              <table>
+              <table className="stack-mobile">
                 <thead>
                   <tr>
                     <th>Nome</th>
@@ -56,8 +56,8 @@ export function CounterpartiesPage() {
                         {counterparty.name}
                         {counterparty.archivedAt && <span className="tag">Arquivado</span>}
                       </td>
-                      <td>{counterparty.phoneNumber ?? "—"}</td>
-                      <td>{counterparty.telegramChatId ? "Conectado" : "—"}</td>
+                      <td data-label="WhatsApp">{counterparty.phoneNumber ?? "—"}</td>
+                      <td data-label="Telegram">{counterparty.telegramChatId ? "Conectado" : "—"}</td>
                       <td className="r">
                         <button type="button" className="btn-link" onClick={() => setModal({ kind: "telegram", counterparty })}>
                           Telegram

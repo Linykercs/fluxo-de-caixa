@@ -226,6 +226,12 @@
   gap: 20px;
 }
 
+/* Sem isso o card (item de grid, min-width auto) cresce junto com uma tabela
+   larga em vez de deixá-la rolar dentro do próprio .table-scroll. */
+.cards-grid > * {
+  min-width: 0;
+}
+
 .cards-grid.cols-1 {
   grid-template-columns: 1fr;
 }
@@ -373,7 +379,8 @@
   margin-bottom: 16px;
 }
 
-.field label {
+.field label,
+.field > span {
   display: block;
   font-size: 12px;
   font-weight: 600;
@@ -381,6 +388,15 @@
   margin-bottom: 6px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+/* Formulário dentro de card (ex: novo usuário) */
+.card > .form-grid {
+  padding: 16px 18px 18px;
+}
+
+.card > .form-grid .modal-footer {
+  margin: 20px -18px -18px;
 }
 
 .field input {
@@ -1208,6 +1224,91 @@ td.money.muted,
   min-height: 48px;
 }
 
+/* ===== Listas em card (versão mobile das tabelas) ===== */
+.entry-cards {
+  display: none;
+}
+
+.entry-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  min-height: 44px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease);
+}
+
+.entry-card:active {
+  background: var(--surface-hover);
+}
+
+.entry-card .ec-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.entry-card .ec-title {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entry-card .ec-sub {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.entry-card .ec-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.entry-card .ec-amount {
+  font-weight: 500;
+}
+
+.entry-cards .empty {
+  padding: 24px 14px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.entry-cards-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 12px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  border-top: 2px solid var(--line);
+}
+
+/* Matrizes largas: primeira coluna fixa enquanto o resto rola */
+.table-scroll.sticky-first th:first-child,
+.table-scroll.sticky-first td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--surface);
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 900px) {
   .app-shell {
@@ -1280,6 +1381,78 @@ td.money.muted,
   .table-scroll table {
     width: max-content;
     min-width: 100%;
+  }
+
+  /* A pagar/A receber: tabela dá lugar aos cards */
+  .entries-table {
+    display: none;
+  }
+
+  .entry-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Tabelas médias empilham como fichas: célula com data-label vira linha
+     rótulo × valor; a primeira célula é o título da ficha */
+  table.stack-mobile {
+    width: 100%;
+  }
+
+  table.stack-mobile thead {
+    display: none;
+  }
+
+  table.stack-mobile tbody,
+  table.stack-mobile tr,
+  table.stack-mobile td {
+    display: block;
+  }
+
+  table.stack-mobile tr {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  table.stack-mobile tr:last-child {
+    border-bottom: none;
+  }
+
+  table.stack-mobile td {
+    border: none;
+    padding: 3px 0;
+  }
+
+  table.stack-mobile td:first-child {
+    font-weight: 600;
+  }
+
+  table.stack-mobile td.r {
+    text-align: left;
+  }
+
+  table.stack-mobile td[data-label] {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  table.stack-mobile td[data-label]::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+  }
+
+  /* Colunas dispensáveis em tela estreita (ex: saldo acumulado do extrato) */
+  th.hide-mobile-col,
+  td.hide-mobile-col {
+    display: none;
   }
 
   .form-grid,

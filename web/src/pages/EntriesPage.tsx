@@ -13,7 +13,7 @@ import { EntryStatusChip } from "../components/entries/EntryStatusChip";
 import { NewEntryModal } from "../components/entries/NewEntryModal";
 import { RecurrenceScopeModal } from "../components/entries/RecurrenceScopeModal";
 import { SettleModal } from "../components/entries/SettleModal";
-import { SkeletonRow } from "../components/Skeleton";
+import { Skeleton, SkeletonRow } from "../components/Skeleton";
 import { counterpartyLabel } from "../lib/counterparty";
 import { addMonths, currentMonth, formatDate, formatMonthLong } from "../lib/dates";
 import { formatBRL } from "../lib/money";
@@ -140,7 +140,7 @@ export function EntriesPage({ direction }: EntriesPageProps) {
         </svg>
       </button>
 
-      <div className={isFetching && !isLoading ? "table-scroll is-refetching" : "table-scroll"}>
+      <div className={`table-scroll entries-table${isFetching && !isLoading ? " is-refetching" : ""}`}>
         <table className="entry-table">
           <thead>
             <tr>
@@ -206,6 +206,51 @@ export function EntriesPage({ direction }: EntriesPageProps) {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Versão em cards da mesma lista; o CSS decide qual aparece pelo breakpoint */}
+      <div className={`entry-cards${isFetching && !isLoading ? " is-refetching" : ""}`}>
+        {isLoading &&
+          [0, 1, 2, 3].map((i) => <Skeleton key={i} height={64} style={{ borderRadius: 12 }} />)}
+        {isError && <div className="empty">Não foi possível carregar os lançamentos.</div>}
+        {!isLoading && !isError && entries?.length === 0 && (
+          <div className="empty">Nenhum lançamento neste mês. Toque em + para criar.</div>
+        )}
+        {entries?.map((entry) => (
+          <button
+            type="button"
+            className="entry-card"
+            key={entry.id}
+            onClick={() => setModal({ kind: "detail", entryId: entry.id })}
+          >
+            <span className="ec-main">
+              <span className="ec-title">
+                {entry.description}
+                {entry.installmentTotal && (
+                  <span className="tag">
+                    {entry.installmentNumber}/{entry.installmentTotal}
+                  </span>
+                )}
+                {entry.recurrenceId && <span className="tag">Recorrente</span>}
+              </span>
+              <span className="ec-sub">
+                {entry.counterparty} · {formatDate(entry.dueDate)}
+              </span>
+            </span>
+            <span className="ec-side">
+              <span className="money ec-amount">{formatBRL(entry.amountCents)}</span>
+              <EntryStatusChip entry={entry} />
+            </span>
+          </button>
+        ))}
+        {!isLoading && !isError && entries && entries.length > 0 && (
+          <div className="entry-cards-total">
+            <span>
+              Total ({entries.length} lançamento{entries.length === 1 ? "" : "s"})
+            </span>
+            <b className="money">{formatBRL(entries.reduce((sum, entry) => sum + entry.amountCents, 0))}</b>
+          </div>
+        )}
       </div>
 
       {modal?.kind === "new" && <NewEntryModal direction={direction} onClose={() => setModal(null)} />}

@@ -89,7 +89,7 @@ export function UsersPage() {
           {isError && <div className="empty">Nao foi possivel carregar os usuarios.</div>}
           {users && users.length === 0 && <div className="empty">Nenhum usuario cadastrado.</div>}
           {users && users.length > 0 && (
-            <table>
+            <table className="stack-mobile">
               <thead>
                 <tr>
                   <th>Nome</th>
@@ -102,8 +102,8 @@ export function UsersPage() {
                 {users.map((user) => (
                   <tr key={user.id}>
                     <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>{user.role === "ADMIN" ? "Administrador" : "Operador"}</td>
+                    <td data-label="E-mail">{user.email}</td>
+                    <td data-label="Perfil">{user.role === "ADMIN" ? "Administrador" : "Operador"}</td>
                     {isAdmin && (
                       <td>
                         {user.id !== me?.id && (

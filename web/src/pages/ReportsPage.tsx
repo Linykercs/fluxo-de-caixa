@@ -193,6 +193,7 @@ export function ReportsPage() {
             {cashFlowLoading && <div className="empty">Carregando…</div>}
             {cashFlowError && <div className="empty">Não foi possível carregar o relatório.</div>}
             {cashFlow && (
+              <div className="table-scroll sticky-first">
               <table>
                 <thead>
                   <tr>
@@ -223,6 +224,7 @@ export function ReportsPage() {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
 
@@ -355,6 +357,7 @@ export function ReportsPage() {
               <div className="empty">Nenhuma movimentação por obra neste mês.</div>
             )}
             {obras && obras.length > 0 && (
+              <div className="table-scroll sticky-first">
               <table>
                 <thead>
                   <tr>
@@ -381,6 +384,7 @@ export function ReportsPage() {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
         </div>

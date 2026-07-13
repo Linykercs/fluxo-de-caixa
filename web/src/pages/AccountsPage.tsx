@@ -150,7 +150,7 @@ function StatementCard({ accountId, accounts, onSelectAccount, from, to, onFromC
                 <th>Data</th>
                 <th>Descrição</th>
                 <th className="r">Valor</th>
-                <th className="r">Saldo</th>
+                <th className="r hide-mobile-col">Saldo</th>
               </tr>
             </thead>
             <tbody>
@@ -166,7 +166,7 @@ function StatementCard({ accountId, accounts, onSelectAccount, from, to, onFromC
                   <td>{formatDate(line.date)}</td>
                   <td>{line.description}</td>
                   <td className={`r money ${line.amountCents < 0 ? "neg" : "pos"}`}>{formatBRL(line.amountCents)}</td>
-                  <td className="r money">{formatBRL(line.balanceCents)}</td>
+                  <td className="r money hide-mobile-col">{formatBRL(line.balanceCents)}</td>
                 </tr>
               ))}
             </tbody>
