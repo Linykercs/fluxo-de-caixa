@@ -69,8 +69,12 @@ export function buildApp(opts: BuildAppOptions = {}): FastifyInstance {
         connectSrc: ["'self'"],
         manifestSrc: ["'self'"],
         workerSrc: ["'self'"],
+        // O app também é acessado por HTTP puro (Tailscale, 100.x:3333);
+        // upgrade-insecure-requests e HSTS quebrariam esse acesso.
+        upgradeInsecureRequests: null,
       },
     },
+    hsts: false,
   });
   app.register(rateLimit, { max: 60, timeWindow: "1 minute" });
   app.register(cors, { origin: config.corsOrigin, credentials: true });
