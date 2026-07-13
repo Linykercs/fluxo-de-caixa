@@ -433,6 +433,14 @@
   border: 1px solid #fecaca;
 }
 
+/* ===== Route loading (Suspense fallback) ===== */
+.route-loading {
+  padding: 48px;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
 /* ===== Placeholder page ===== */
 .placeholder {
   background: var(--surface);

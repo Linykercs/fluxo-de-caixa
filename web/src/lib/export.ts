@@ -1,14 +1,26 @@
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import * as XLSX from "xlsx";
+import type { jsPDF } from "jspdf";
 import type { CostCenterReport, DreReport } from "../api/types";
 import { formatMonthLong } from "./dates";
 import { formatBRL } from "./money";
 
+// jspdf/jspdf-autotable e xlsx são pesados (centenas de KB) e só são necessários
+// quando o usuário exporta; import() dinâmico os mantém fora do chunk inicial.
+async function loadPdf() {
+  const [{ jsPDF }, { default: autoTable }] = await Promise.all([
+    import("jspdf"),
+    import("jspdf-autotable"),
+  ]);
+  return { jsPDF, autoTable };
+}
+
+async function loadXlsx() {
+  return import("xlsx");
+}
+
 // ─── PDF helpers ────────────────────────────────────────────────────────────
 
-function makePdf(title: string, orientation: "p" | "l" = "p"): jsPDF {
-  const doc = new jsPDF({ orientation, unit: "mm", format: "a4" });
+function makePdf(JsPdf: typeof jsPDF, title: string, orientation: "p" | "l" = "p"): jsPDF {
+  const doc = new JsPdf({ orientation, unit: "mm", format: "a4" });
   doc.setFontSize(14);
   doc.setFont("helvetica", "bold");
   doc.text(title, 14, 18);
@@ -23,7 +35,8 @@ function downloadPdf(doc: jsPDF, filename: string): void {
 
 // ─── Excel helpers ──────────────────────────────────────────────────────────
 
-function downloadXlsx(rows: (string | number)[][], filename: string, sheetName = "Dados"): void {
+async function downloadXlsx(rows: (string | number)[][], filename: string, sheetName = "Dados"): Promise<void> {
+  const XLSX = await loadXlsx();
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(rows);
   XLSX.utils.book_append_sheet(wb, ws, sheetName);
@@ -32,9 +45,10 @@ function downloadXlsx(rows: (string | number)[][], filename: string, sheetName =
 
 // ─── DRE ────────────────────────────────────────────────────────────────────
 
-export function exportDrePdf(dre: DreReport, month: string): void {
+export async function exportDrePdf(dre: DreReport, month: string): Promise<void> {
+  const { jsPDF: JsPdf, autoTable } = await loadPdf();
   const title = `DRE — ${formatMonthLong(month)}`;
-  const doc = makePdf(title);
+  const doc = makePdf(JsPdf, title);
   let y = 26;
 
   autoTable(doc, {
@@ -76,7 +90,7 @@ export function exportDrePdf(dre: DreReport, month: string): void {
   downloadPdf(doc, `dre-${month}.pdf`);
 }
 
-export function exportDreExcel(dre: DreReport, month: string): void {
+export async function exportDreExcel(dre: DreReport, month: string): Promise<void> {
   const rows: (string | number)[][] = [
     [`DRE — ${formatMonthLong(month)}`],
     [],
@@ -90,14 +104,15 @@ export function exportDreExcel(dre: DreReport, month: string): void {
     [],
     ["Resultado do mês", dre.resultadoCents / 100],
   ];
-  downloadXlsx(rows, `dre-${month}.xlsx`, "DRE");
+  await downloadXlsx(rows, `dre-${month}.xlsx`, "DRE");
 }
 
 // ─── Obras ──────────────────────────────────────────────────────────────────
 
-export function exportObrasPdf(obras: CostCenterReport[], month: string): void {
+export async function exportObrasPdf(obras: CostCenterReport[], month: string): Promise<void> {
+  const { jsPDF: JsPdf, autoTable } = await loadPdf();
   const title = `Relatório por Obra — ${formatMonthLong(month)}`;
-  const doc = makePdf(title, "l");
+  const doc = makePdf(JsPdf, title, "l");
 
   const summaryBody = obras.map((cc) => [
     cc.costCenterName,
@@ -128,7 +143,7 @@ export function exportObrasPdf(obras: CostCenterReport[], month: string): void {
   downloadPdf(doc, `obras-${month}.pdf`);
 }
 
-export function exportObrasExcel(obras: CostCenterReport[], month: string): void {
+export async function exportObrasExcel(obras: CostCenterReport[], month: string): Promise<void> {
   const header = [
     `Relatório por Obra — ${formatMonthLong(month)}`,
   ];
@@ -169,5 +184,5 @@ export function exportObrasExcel(obras: CostCenterReport[], month: string): void
     }
   }
 
-  downloadXlsx(rows, `obras-${month}.xlsx`, "Por Obra");
+  await downloadXlsx(rows, `obras-${month}.xlsx`, "Por Obra");
 }

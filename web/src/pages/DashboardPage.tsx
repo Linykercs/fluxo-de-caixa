@@ -1,8 +1,13 @@
+import { lazy, Suspense } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useDashboard } from "../api/dashboard";
 import { useChartReport } from "../api/reports";
-import { CashFlowChart } from "../components/CashFlowChart";
 import { Skeleton } from "../components/Skeleton";
+
+// recharts é pesado; carrega junto com o gráfico só quando há dados pra mostrar.
+const CashFlowChart = lazy(() =>
+  import("../components/CashFlowChart").then((m) => ({ default: m.CashFlowChart })),
+);
 import {
   addMonths,
   currentMonth,
@@ -189,7 +194,9 @@ export function DashboardPage() {
               <span className="muted">realizado (caixa)</span>
             </div>
             <div style={{ padding: "16px 8px 8px" }}>
-              <CashFlowChart data={chartData} />
+              <Suspense fallback={<Skeleton height={240} />}>
+                <CashFlowChart data={chartData} />
+              </Suspense>
             </div>
           </div>
         </div>
