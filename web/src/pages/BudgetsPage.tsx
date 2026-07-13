@@ -15,16 +15,16 @@ function ProgressBar({ row }: { row: BudgetReportRow }) {
   const over = row.actualCents > row.budgetedCents;
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-      <div style={{ flex: 1, height: 8, background: "#eee", borderRadius: 4, overflow: "hidden" }}>
+      <div style={{ flex: 1, height: 8, background: "var(--neutral-bg)", borderRadius: 4, overflow: "hidden" }}>
         <div
           style={{
             width: `${Math.min(pct, 100)}%`,
             height: "100%",
-            background: over ? "#e94560" : "#2f9e44",
+            background: over ? "var(--red)" : "var(--green)",
           }}
         />
       </div>
-      <span style={{ fontSize: 12, color: over ? "#e94560" : "#666", minWidth: 40, textAlign: "right" }}>{pct}%</span>
+      <span style={{ fontSize: 12, color: over ? "var(--red)" : "var(--ink-soft)", minWidth: 40, textAlign: "right" }}>{pct}%</span>
     </div>
   );
 }

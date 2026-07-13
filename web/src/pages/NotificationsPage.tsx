@@ -77,7 +77,7 @@ export function NotificationsPage() {
 
           {status && (
             <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 14 }}>
-              <p style={{ margin: 0, color: "#555" }}>
+              <p style={{ margin: 0, color: "var(--ink-soft)" }}>
                 Avisa automaticamente no Telegram quando um lançamento vence amanhã e quando vence hoje.
               </p>
 
@@ -85,8 +85,8 @@ export function NotificationsPage() {
                 <>
                   <div
                     style={{
-                      color: "#166534",
-                      background: "#dcfce7",
+                      color: "var(--green)",
+                      background: "var(--green-bg)",
                       borderRadius: 8,
                       padding: "10px 14px",
                       fontSize: 14,
@@ -107,9 +107,9 @@ export function NotificationsPage() {
                       Desvincular
                     </button>
                   </div>
-                  {testResult === "ok" && <span style={{ color: "#166534", fontSize: 14 }}>Mensagem enviada!</span>}
+                  {testResult === "ok" && <span style={{ color: "var(--green)", fontSize: 14 }}>Mensagem enviada!</span>}
                   {testResult === "error" && (
-                    <span style={{ color: "#e94560", fontSize: 14 }}>
+                    <span style={{ color: "var(--red)", fontSize: 14 }}>
                       {test.error instanceof ApiError ? test.error.message : "Falha ao enviar."}
                     </span>
                   )}
@@ -118,8 +118,8 @@ export function NotificationsPage() {
                 <>
                   <div
                     style={{
-                      color: "#92400e",
-                      background: "#fef3c7",
+                      color: "var(--amber)",
+                      background: "var(--amber-bg)",
                       borderRadius: 8,
                       padding: "10px 14px",
                       fontSize: 14,
@@ -139,13 +139,13 @@ export function NotificationsPage() {
                         2. Toque em <b>Iniciar</b>. A vinculação é automática.
                       </p>
                       {inviteUrl && (
-                        <code style={{ fontSize: 12, wordBreak: "break-all", background: "#f4f4f4", padding: 8, borderRadius: 6 }}>
+                        <code style={{ fontSize: 12, wordBreak: "break-all", background: "var(--bg)", padding: 8, borderRadius: 6 }}>
                           {inviteUrl}
                         </code>
                       )}
                     </>
                   ) : (
-                    <p style={{ margin: 0, fontSize: 14, color: "#888" }}>
+                    <p style={{ margin: 0, fontSize: 14, color: "var(--ink-soft)" }}>
                       Bot do Telegram ainda não configurado no servidor (TELEGRAM_BOT_USERNAME).
                     </p>
                   )}
@@ -174,7 +174,7 @@ export function NotificationsPage() {
 
           {wa && (
             <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 14 }}>
-              <p style={{ margin: 0, color: "#555" }}>
+              <p style={{ margin: 0, color: "var(--ink-soft)" }}>
                 Sessão única do servidor (não é por usuário); cadastre aqui o número que deve receber os avisos desta
                 organização.
               </p>
@@ -200,7 +200,7 @@ export function NotificationsPage() {
                       fontSize: 28,
                       fontWeight: 700,
                       letterSpacing: 4,
-                      background: "#f4f4f4",
+                      background: "var(--bg)",
                       padding: "10px 16px",
                       borderRadius: 8,
                     }}
@@ -212,7 +212,7 @@ export function NotificationsPage() {
 
               {wa.status !== "connected" && wa.status !== "qr" && wa.status !== "code" && (
                 <div
-                  style={{ color: "#92400e", background: "#fef3c7", borderRadius: 8, padding: "10px 14px", fontSize: 14 }}
+                  style={{ color: "var(--amber)", background: "var(--amber-bg)", borderRadius: 8, padding: "10px 14px", fontSize: 14 }}
                 >
                   ⚠️ {WHATSAPP_STATUS_LABEL[wa.status] ?? wa.status}
                 </div>
@@ -220,7 +220,7 @@ export function NotificationsPage() {
 
               {wa.status === "connected" && (
                 <div
-                  style={{ color: "#166534", background: "#dcfce7", borderRadius: 8, padding: "10px 14px", fontSize: 14 }}
+                  style={{ color: "var(--green)", background: "var(--green-bg)", borderRadius: 8, padding: "10px 14px", fontSize: 14 }}
                 >
                   ✅ Sessão do bot conectada.
                 </div>
@@ -245,9 +245,9 @@ export function NotificationsPage() {
                   <button type="button" className="btn-link" onClick={handleTestWa} disabled={testWa.isPending}>
                     {testWa.isPending ? "Enviando…" : "Enviar mensagem de teste"}
                   </button>
-                  {waTestResult === "ok" && <span style={{ color: "#166534", fontSize: 14, marginLeft: 10 }}>Mensagem enviada!</span>}
+                  {waTestResult === "ok" && <span style={{ color: "var(--green)", fontSize: 14, marginLeft: 10 }}>Mensagem enviada!</span>}
                   {waTestResult === "error" && (
-                    <span style={{ color: "#e94560", fontSize: 14, marginLeft: 10 }}>
+                    <span style={{ color: "var(--red)", fontSize: 14, marginLeft: 10 }}>
                       {testWa.error instanceof ApiError ? testWa.error.message : "Falha ao enviar."}
                     </span>
                   )}

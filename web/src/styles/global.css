@@ -40,7 +40,7 @@ body {
 }
 
 .chip.open {
-  background: #eef1ee;
+  background: var(--neutral-bg);
   color: var(--ink-soft);
 }
 
@@ -121,7 +121,7 @@ a {
 .skeleton {
   display: block;
   border-radius: 6px;
-  background: linear-gradient(90deg, var(--line) 25%, #eef1ee 50%, var(--line) 75%);
+  background: linear-gradient(90deg, var(--line) 25%, var(--neutral-bg) 50%, var(--line) 75%);
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.4s ease-in-out infinite;
 }

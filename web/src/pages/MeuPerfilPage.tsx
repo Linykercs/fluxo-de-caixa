@@ -73,7 +73,7 @@ export function MeuPerfilPage() {
               />
             </label>
             <label className="field full">
-              <span>Senha atual <span style={{ color: "#e94560" }}>*</span></span>
+              <span>Senha atual <span style={{ color: "var(--red)" }}>*</span></span>
               <input
                 type="password"
                 value={currentPassword}
@@ -83,7 +83,7 @@ export function MeuPerfilPage() {
               />
             </label>
             <label className="field full">
-              <span>Nova senha <span style={{ color: "#888", fontWeight: 400 }}>(deixe em branco para manter)</span></span>
+              <span>Nova senha <span style={{ color: "var(--ink-soft)", fontWeight: 400 }}>(deixe em branco para manter)</span></span>
               <input
                 type="password"
                 value={newPassword}
@@ -95,7 +95,7 @@ export function MeuPerfilPage() {
             </label>
             {errorMessage && <div className="form-error full">{errorMessage}</div>}
             {success && (
-              <div className="full" style={{ color: "#166534", background: "#dcfce7", borderRadius: 8, padding: "10px 14px", fontSize: 14 }}>
+              <div className="full" style={{ color: "var(--green)", background: "var(--green-bg)", borderRadius: 8, padding: "10px 14px", fontSize: 14 }}>
                 Dados atualizados com sucesso!
               </div>
             )}

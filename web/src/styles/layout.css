@@ -11,7 +11,7 @@
   color: var(--sidebar-text);
   padding: 24px 0;
   font-size: 13px;
-  border-right: 1px solid rgba(74, 222, 128, 0.08);
+  border-right: 1px solid rgba(79, 168, 255, 0.08);
   display: flex;
   flex-direction: column;
 }
@@ -61,11 +61,11 @@
 }
 
 .sidebar .nav-section {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: rgba(157, 184, 168, 0.5);
+  color: rgba(143, 167, 192, 0.55);
   padding: 16px 20px 6px;
 }
 
@@ -76,11 +76,11 @@
 }
 
 .sidebar .accounts-title {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: rgba(157, 184, 168, 0.5);
+  color: rgba(143, 167, 192, 0.55);
   margin-bottom: 10px;
 }
 
@@ -146,7 +146,7 @@
 }
 
 .page-head h2 {
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--ink);
@@ -238,7 +238,7 @@
 
 .card .card-header {
   padding: 14px 18px;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
   letter-spacing: -0.01em;
   border-bottom: 1px solid var(--line);
@@ -250,6 +250,7 @@
 .card .card-header .muted {
   color: var(--ink-soft);
   font-weight: 400;
+  font-size: 13px;
 }
 
 .card .empty {
@@ -318,12 +319,12 @@
   height: 12px;
   border-radius: 3px;
   background: var(--green-bg);
-  border: 1px solid #bbf7d0;
+  border: 1px solid var(--green-line);
 }
 
 .bar-row .bar.n {
   background: var(--red-bg);
-  border-color: #fecaca;
+  border-color: var(--red-line);
 }
 
 .bar-row .v {
@@ -353,7 +354,7 @@
 
 .login-card .brand {
   font-weight: 700;
-  font-size: 18px;
+  font-size: 20px;
   color: var(--ink);
   margin-bottom: 4px;
   display: flex;
@@ -398,6 +399,7 @@
   outline: none;
   border-color: var(--accent);
   background: var(--surface);
+  box-shadow: 0 0 0 3px var(--accent-light);
 }
 
 .btn-primary {
@@ -430,7 +432,7 @@
   padding: 10px 12px;
   font-size: 13px;
   margin-bottom: 16px;
-  border: 1px solid #fecaca;
+  border: 1px solid var(--red-line);
 }
 
 /* ===== Route loading (Suspense fallback) ===== */
@@ -500,7 +502,7 @@
 }
 
 .entry-table tbody tr:hover {
-  background: #f8faf8;
+  background: var(--surface-hover);
 }
 
 .entry-table tbody tr.total-row {
@@ -516,14 +518,14 @@
 }
 
 .cell-sub {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--ink-soft);
   margin-top: 2px;
 }
 
 .tag {
   display: inline-block;
-  font-size: 10px;
+  font-size: 11px;
   color: var(--ink-soft);
   background: var(--bg);
   border: 1px solid var(--line);
@@ -623,7 +625,7 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(11, 20, 14, 0.55);
+  background: var(--overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -635,7 +637,7 @@
 .modal {
   background: var(--surface);
   border-radius: 14px;
-  box-shadow: 0 16px 48px rgba(11, 20, 14, 0.2);
+  box-shadow: var(--shadow-modal);
   width: 100%;
   max-width: 480px;
   max-height: 90vh;
@@ -741,6 +743,7 @@
   outline: none;
   border-color: var(--accent);
   background: var(--surface);
+  box-shadow: 0 0 0 3px var(--accent-light);
 }
 
 .field textarea {
@@ -749,7 +752,7 @@
 }
 
 .hint {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--ink-soft);
 }
 
@@ -774,7 +777,7 @@
 
 .detail-grid .lbl {
   color: var(--ink-soft);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -790,7 +793,7 @@
 }
 
 .detail-section-title {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -858,7 +861,7 @@
 }
 
 .account-card:hover {
-  background: #f8faf8;
+  background: var(--surface-hover);
 }
 
 .account-card.selected {
@@ -878,7 +881,7 @@
 }
 
 .account-card-body .val {
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 500;
   font-family: var(--font-mono);
 }
@@ -931,7 +934,7 @@
 }
 
 td.section-row {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -949,7 +952,7 @@ td.section-row {
 }
 
 .row-clickable:hover {
-  background: #f8faf8;
+  background: var(--surface-hover);
 }
 
 /* ===== Importação de extrato ===== */
@@ -1035,7 +1038,7 @@ td.section-row {
 
 .tab-btn:not(.active):hover {
   background: var(--bg);
-  border-color: #c4d0c8;
+  border-color: #c3cdd9;
 }
 
 /* ===== Relatório por obra ===== */

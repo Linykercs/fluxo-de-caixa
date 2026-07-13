@@ -44,7 +44,7 @@ export function CounterpartyTelegramModal({ counterparty, onClose }: Counterpart
 
           {status.linked ? (
             <>
-              <div style={{ color: "#166534", background: "#dcfce7", borderRadius: 8, padding: "10px 14px", fontSize: 14 }}>
+              <div style={{ color: "var(--green)", background: "var(--green-bg)", borderRadius: 8, padding: "10px 14px", fontSize: 14 }}>
                 ✅ Conectado.
               </div>
               <div style={{ display: "flex", gap: 10 }}>
@@ -55,16 +55,16 @@ export function CounterpartyTelegramModal({ counterparty, onClose }: Counterpart
                   Desvincular
                 </button>
               </div>
-              {testResult === "ok" && <span style={{ color: "#166534", fontSize: 14 }}>Mensagem enviada!</span>}
+              {testResult === "ok" && <span style={{ color: "var(--green)", fontSize: 14 }}>Mensagem enviada!</span>}
               {testResult === "error" && (
-                <span style={{ color: "#e94560", fontSize: 14 }}>
+                <span style={{ color: "var(--red)", fontSize: 14 }}>
                   {test.error instanceof ApiError ? test.error.message : "Falha ao enviar."}
                 </span>
               )}
             </>
           ) : (
             <>
-              <div style={{ color: "#92400e", background: "#fef3c7", borderRadius: 8, padding: "10px 14px", fontSize: 14 }}>
+              <div style={{ color: "var(--amber)", background: "var(--amber-bg)", borderRadius: 8, padding: "10px 14px", fontSize: 14 }}>
                 ⚠️ Ainda não conectado.
               </div>
               {status.botUsername ? (
@@ -73,7 +73,7 @@ export function CounterpartyTelegramModal({ counterparty, onClose }: Counterpart
                     Manda esse link pro cliente abrir e tocar em <b>Iniciar</b> no Telegram:
                   </p>
                   {inviteUrl && (
-                    <code style={{ fontSize: 12, wordBreak: "break-all", background: "#f4f4f4", padding: 8, borderRadius: 6 }}>
+                    <code style={{ fontSize: 12, wordBreak: "break-all", background: "var(--bg)", padding: 8, borderRadius: 6 }}>
                       {inviteUrl}
                     </code>
                   )}

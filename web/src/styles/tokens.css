@@ -1,12 +1,14 @@
 :root {
-  /* Estrutura */
-  --bg: #f4f5f4;
+  /* Estrutura (neutros com viés azul, alinhados à sidebar) */
+  --bg: #f4f5f7;
   --surface: #ffffff;
-  --line: #dde3df;
+  --surface-hover: #f7f8fa;
+  --line: #dce1e8;
+  --neutral-bg: #edf0f3;
 
   /* Texto */
-  --ink: #111a14;
-  --ink-soft: #586358;
+  --ink: #101720;
+  --ink-soft: #566271;
 
   /* Sidebar */
   --sidebar-bg: #0b1e33;
@@ -22,10 +24,16 @@
   /* Semânticos */
   --green: #166534;
   --green-bg: #f0fdf4;
+  --green-line: #bbf7d0;
   --red: #b91c1c;
   --red-bg: #fef2f2;
+  --red-line: #fecaca;
   --amber: #92600a;
   --amber-bg: #fffbeb;
+
+  /* Sombras e véus (base azul-escura, não verde) */
+  --overlay: rgba(11, 18, 28, 0.55);
+  --shadow-modal: 0 16px 48px rgba(11, 18, 28, 0.2);
 
   /* Tipografia */
   --font-body: 'DM Sans', system-ui, -apple-system, sans-serif;

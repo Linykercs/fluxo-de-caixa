@@ -68,7 +68,7 @@ function CostCenterRow({ cc }: { cc: CostCenterReport }) {
   return (
     <>
       <tr className="row-clickable" onClick={() => setExpanded((v) => !v)}>
-        <td style={cc.costCenterId === null ? { fontStyle: "italic", color: "#888" } : undefined}>
+        <td style={cc.costCenterId === null ? { fontStyle: "italic", color: "var(--ink-soft)" } : undefined}>
           {cc.costCenterName} {expanded ? "▲" : "▼"}
         </td>
         <td className="r money pos">{formatBRL(cc.totalReceitasRealizadoCents)}</td>

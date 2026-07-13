@@ -48,12 +48,12 @@ export function CashFlowChart({ data }: Props) {
             value === "receitas" ? "Receitas" : value === "despesas" ? "Despesas" : "Resultado líquido"
           }
         />
-        <Bar dataKey="receitas" fill="#166534" radius={[4, 4, 0, 0]} />
-        <Bar dataKey="despesas" fill="#e94560" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="receitas" fill="var(--green)" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="despesas" fill="var(--red)" radius={[4, 4, 0, 0]} />
         <Line
           type="monotone"
           dataKey="resultado"
-          stroke="#2563eb"
+          stroke="var(--accent)"
           strokeWidth={2}
           dot={{ r: 3 }}
           activeDot={{ r: 5 }}
