@@ -19,6 +19,7 @@ const NotificationsPage = lazy(() => import("./pages/NotificationsPage").then((m
 const ReportsPage = lazy(() => import("./pages/ReportsPage").then((m) => ({ default: m.ReportsPage })));
 const UsersPage = lazy(() => import("./pages/UsersPage").then((m) => ({ default: m.UsersPage })));
 const MeuPerfilPage = lazy(() => import("./pages/MeuPerfilPage").then((m) => ({ default: m.MeuPerfilPage })));
+const MorePage = lazy(() => import("./pages/MorePage").then((m) => ({ default: m.MorePage })));
 
 export function App() {
   return (
@@ -34,6 +35,7 @@ export function App() {
             <Route path="/orcamentos" element={<BudgetsPage />} />
             <Route path="/relatorios" element={<ReportsPage />} />
             <Route path="/meu-perfil" element={<MeuPerfilPage />} />
+            <Route path="/mais" element={<MorePage />} />
             <Route element={<RequireAdmin />}>
               <Route path="/contas" element={<AccountsPage />} />
               <Route path="/importar-extrato" element={<ImportStatementPage />} />

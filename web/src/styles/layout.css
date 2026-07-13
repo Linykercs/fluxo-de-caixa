@@ -1052,51 +1052,205 @@ td.money.muted,
   color: var(--ink-soft);
 }
 
+/* ===== Mobile chrome (topbar, bottom nav, FAB, página Mais) ===== */
+
+/* Desktop: o chrome mobile não existe */
+.mobile-topbar,
+.bottom-nav,
+.fab {
+  display: none;
+}
+
+.mobile-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  align-items: center;
+  gap: 10px;
+  background: var(--sidebar-bg);
+  color: #fff;
+  padding: 12px 16px;
+  padding-top: calc(12px + env(safe-area-inset-top));
+}
+
+.mobile-topbar h1 {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.mobile-topbar .brand-logo {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  padding: 4px 4px calc(4px + env(safe-area-inset-bottom));
+}
+
+.bn-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 48px;
+  padding: 4px 0;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease);
+}
+
+.bn-item svg {
+  width: 22px;
+  height: 22px;
+}
+
+.bn-item.active {
+  color: var(--accent);
+}
+
+.fab {
+  position: fixed;
+  right: 16px;
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  z-index: 40;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(30, 78, 140, 0.4);
+  transition: background var(--duration-fast) var(--ease);
+}
+
+.fab:hover {
+  background: var(--accent-hover);
+}
+
+.fab svg {
+  width: 26px;
+  height: 26px;
+}
+
+.more-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.more-balances {
+  padding: 8px 18px 14px;
+}
+
+.more-balance-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.more-balance-row b {
+  font-weight: 500;
+}
+
+.more-balance-row.total {
+  border-top: 1px solid var(--line);
+  margin-top: 4px;
+  padding-top: 12px;
+  font-weight: 700;
+}
+
+.more-links {
+  display: flex;
+  flex-direction: column;
+}
+
+.more-links a {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+}
+
+.more-links a:last-child {
+  border-bottom: none;
+}
+
+.more-links a:active {
+  background: var(--surface-hover);
+}
+
+.more-logout {
+  min-height: 48px;
+}
+
 /* ===== Responsive ===== */
-@media (max-width: 860px) {
+@media (max-width: 900px) {
   .app-shell {
     grid-template-columns: 1fr;
   }
 
+  /* Sidebar dá lugar à topbar + bottom nav */
   .sidebar {
-    padding: 16px;
+    display: none;
   }
 
-  .sidebar .brand {
-    padding: 0 0 12px;
+  .mobile-topbar {
+    display: flex;
   }
 
-  .sidebar nav {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 4px;
+  .bottom-nav {
+    display: flex;
   }
 
-  /* Em coluna (desktop) o nav-section já cai na própria linha; em linha
-     (mobile) precisa forçar isso, senão fica espremido no meio dos links. */
-  .sidebar .nav-section {
-    flex-basis: 100%;
-    margin-top: 4px;
+  .fab {
+    display: inline-flex;
   }
 
-  .sidebar nav a {
-    padding: 8px 12px;
-    border-radius: 6px;
-    border-left: none;
-  }
-
-  .sidebar nav a.active {
-    border-left: none;
-    padding-left: 12px;
-    border-radius: 6px;
-  }
-
-  .sidebar .accounts {
-    margin-top: 16px;
+  .hide-mobile {
+    display: none;
   }
 
   .main {
     padding: 16px;
+    /* espaço pro chrome fixo em cima e embaixo */
+    padding-top: calc(66px + env(safe-area-inset-top));
+    padding-bottom: calc(84px + env(safe-area-inset-bottom));
+  }
+
+  /* O título da tela já está na topbar; sobra a navegação de mês */
+  .page-head h2 {
+    display: none;
+  }
+
+  .page-head .month-nav {
+    margin-left: 0;
+    width: 100%;
+    justify-content: space-between;
   }
 
   .saldo-strip {

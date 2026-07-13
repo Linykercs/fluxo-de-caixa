@@ -129,10 +129,16 @@ export function EntriesPage({ direction }: EntriesPageProps) {
           </select>
         </div>
         <div className="spacer" />
-        <button type="button" className="btn-primary" onClick={() => setModal({ kind: "new" })}>
+        <button type="button" className="btn-primary hide-mobile" onClick={() => setModal({ kind: "new" })}>
           + Novo lançamento
         </button>
       </div>
+
+      <button type="button" className="fab" aria-label="Novo lançamento" onClick={() => setModal({ kind: "new" })}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+      </button>
 
       <div className={isFetching && !isLoading ? "table-scroll is-refetching" : "table-scroll"}>
         <table className="entry-table">
