@@ -10,3 +10,6 @@ server/src/generated/
 .tmp-test/
 
 .claude/
+
+# Credenciais reais (nao commitar)
+docs/credentials.local.md
