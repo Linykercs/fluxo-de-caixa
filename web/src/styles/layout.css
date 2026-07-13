@@ -46,7 +46,7 @@
   color: inherit;
   text-decoration: none;
   border-left: 3px solid transparent;
-  transition: color 0.15s, background 0.15s;
+  transition: color var(--duration-base) var(--ease), background var(--duration-base) var(--ease);
 }
 
 .sidebar nav a:hover {
@@ -122,7 +122,7 @@
   font-size: 12px;
   text-align: left;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color var(--duration-base) var(--ease), border-color var(--duration-base) var(--ease);
 }
 
 .sidebar .logout button:hover {
@@ -167,7 +167,7 @@
   font-size: 13px;
   padding: 6px 11px;
   cursor: pointer;
-  transition: background 0.12s;
+  transition: background var(--duration-fast) var(--ease);
 }
 
 .month-nav button:hover {
@@ -408,7 +408,7 @@
   font-family: var(--font-body);
   background: var(--bg);
   color: var(--ink);
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color var(--duration-base) var(--ease), background var(--duration-base) var(--ease);
 }
 
 .field input:focus {
@@ -429,7 +429,7 @@
   font-weight: 600;
   cursor: pointer;
   font-family: var(--font-body);
-  transition: background 0.15s;
+  transition: background var(--duration-base) var(--ease);
 }
 
 .btn-primary:hover {
@@ -457,6 +457,17 @@
   text-align: center;
   color: var(--ink-soft);
   font-size: 14px;
+}
+
+/* ===== Estado de página (carregando / erro fora de card) ===== */
+.page-state {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 32px;
+  color: var(--ink-soft);
+  font-size: 14px;
+  text-align: center;
 }
 
 /* ===== Placeholder page ===== */
@@ -497,7 +508,7 @@
   font-size: 13px;
   padding: 7px 10px;
   font-family: var(--font-body);
-  transition: border-color 0.15s;
+  transition: border-color var(--duration-base) var(--ease);
 }
 
 .toolbar select:focus,
@@ -514,7 +525,7 @@
 
 .entry-table tbody tr {
   cursor: pointer;
-  transition: background 0.1s;
+  transition: background var(--duration-fast) var(--ease);
 }
 
 .entry-table tbody tr:hover {
@@ -561,7 +572,7 @@
   font-weight: 600;
   cursor: pointer;
   font-family: var(--font-body);
-  transition: background 0.12s;
+  transition: background var(--duration-fast) var(--ease);
 }
 
 .btn-secondary:hover {
@@ -578,7 +589,7 @@
   font-weight: 600;
   cursor: pointer;
   font-family: var(--font-body);
-  transition: background 0.12s;
+  transition: background var(--duration-fast) var(--ease);
 }
 
 .btn-danger:hover {
@@ -691,7 +702,7 @@
   line-height: 1;
   cursor: pointer;
   padding: 0;
-  transition: color 0.12s;
+  transition: color var(--duration-fast) var(--ease);
 }
 
 .modal-close:hover {
@@ -721,7 +732,7 @@
   color: var(--ink-soft);
   cursor: pointer;
   font-family: var(--font-body);
-  transition: color 0.12s;
+  transition: color var(--duration-fast) var(--ease);
 }
 
 .tabs button.active {
@@ -751,7 +762,7 @@
   font-family: var(--font-body);
   background: var(--bg);
   color: var(--ink);
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color var(--duration-base) var(--ease), background var(--duration-base) var(--ease);
 }
 
 .field select:focus,
@@ -873,7 +884,7 @@
   justify-content: space-between;
   padding: 16px 18px;
   cursor: pointer;
-  transition: background 0.1s;
+  transition: background var(--duration-fast) var(--ease);
 }
 
 .account-card:hover {
@@ -1042,7 +1053,7 @@ td.section-row {
   font-size: 13px;
   font-family: var(--font-body);
   cursor: pointer;
-  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  transition: background var(--duration-fast) var(--ease), color var(--duration-fast) var(--ease), border-color var(--duration-fast) var(--ease);
 }
 
 .tab-btn.active {
@@ -1300,15 +1311,6 @@ td.money.muted,
   border-top: 2px solid var(--line);
 }
 
-/* Matrizes largas: primeira coluna fixa enquanto o resto rola */
-.table-scroll.sticky-first th:first-child,
-.table-scroll.sticky-first td:first-child {
-  position: sticky;
-  left: 0;
-  z-index: 1;
-  background: var(--surface);
-}
-
 /* ===== Responsive ===== */
 @media (max-width: 900px) {
   .app-shell {
@@ -1453,6 +1455,15 @@ td.money.muted,
   th.hide-mobile-col,
   td.hide-mobile-col {
     display: none;
+  }
+
+  /* Matrizes largas: primeira coluna fixa enquanto o resto rola */
+  .table-scroll.sticky-first th:first-child,
+  .table-scroll.sticky-first td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--surface);
   }
 
   .form-grid,

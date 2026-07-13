@@ -11,11 +11,11 @@ export function CategoriesPage() {
   const [modal, setModal] = useState<ModalState>(null);
 
   if (isLoading) {
-    return <p>Carregando…</p>;
+    return <p className="page-state">Carregando categorias…</p>;
   }
 
   if (isError || !categories) {
-    return <p>Não foi possível carregar as categorias.</p>;
+    return <p className="page-state">Não foi possível carregar as categorias. Verifique a conexão e recarregue a página.</p>;
   }
 
   const expenses = categories.filter((category) => category.kind === "EXPENSE");

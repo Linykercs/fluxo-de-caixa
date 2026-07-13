@@ -17,11 +17,11 @@ export function AccountsPage() {
   const [to, setTo] = useState("");
 
   if (isLoading) {
-    return <p>Carregando…</p>;
+    return <p className="page-state">Carregando contas…</p>;
   }
 
   if (isError || !accounts) {
-    return <p>Não foi possível carregar as contas.</p>;
+    return <p className="page-state">Não foi possível carregar as contas. Verifique a conexão e recarregue a página.</p>;
   }
 
   const activeAccounts = accounts.filter((account) => !account.archivedAt);

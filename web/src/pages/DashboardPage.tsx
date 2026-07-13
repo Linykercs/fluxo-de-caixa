@@ -79,7 +79,7 @@ export function DashboardPage() {
   }
 
   if (isError || !data) {
-    return <p>Não foi possível carregar o painel.</p>;
+    return <p className="page-state">Não foi possível carregar o painel. Verifique a conexão e recarregue a página.</p>;
   }
 
   const previstoFimCents = data.projection.find((p) => p.month === month)?.balanceCents;

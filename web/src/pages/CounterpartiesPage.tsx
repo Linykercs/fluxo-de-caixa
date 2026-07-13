@@ -15,8 +15,9 @@ export function CounterpartiesPage() {
   const { data: counterparties, isLoading, isError } = useCounterparties();
   const [modal, setModal] = useState<ModalState>(null);
 
-  if (isLoading) return <p>Carregando…</p>;
-  if (isError || !counterparties) return <p>Não foi possível carregar os clientes.</p>;
+  if (isLoading) return <p className="page-state">Carregando clientes…</p>;
+  if (isError || !counterparties)
+    return <p className="page-state">Não foi possível carregar os clientes. Verifique a conexão e recarregue a página.</p>;
 
   return (
     <>

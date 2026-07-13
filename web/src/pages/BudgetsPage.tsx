@@ -100,8 +100,10 @@ export function BudgetsPage() {
         </div>
       </div>
 
-      {isLoading && <p>Carregando…</p>}
-      {isError && <p>Não foi possível carregar os orçamentos.</p>}
+      {isLoading && <p className="page-state">Carregando orçamentos…</p>}
+      {isError && (
+        <p className="page-state">Não foi possível carregar os orçamentos. Verifique a conexão e recarregue a página.</p>
+      )}
 
       {report && (
         <div className="cards-grid cols-1">
