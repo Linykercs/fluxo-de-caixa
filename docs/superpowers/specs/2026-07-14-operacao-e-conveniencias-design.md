@@ -43,10 +43,13 @@ sobre o WhatsApp. Fora de escopo: domínio fixo (item 2, aguarda eu.org).
 
 - `.npmrc`: remover a linha inválida `omit=` (warning em todo comando npm).
 - `npm audit fix` para o dompurify (moderate, fix disponível).
-- `xlsx`: o pacote do registro npm está abandonado em 0.18.5 com 1 high (prototype
-  pollution + ReDoS) e sem fix. Troca para o tarball oficial do SheetJS
-  (`https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz`), mesma API, CVEs corrigidas.
-  Exportações de Excel são re-testadas após a troca.
+- `xlsx`: o pacote do registro npm está parado em 0.18.5 com 1 high (prototype
+  pollution + ReDoS), sem fix no registro. Plano original era o tarball oficial do
+  SheetJS, mas o cdn.sheetjs.com responde 403 desta rede. Análise de risco: as duas
+  CVEs estão nos caminhos de LEITURA de planilhas; o app só ESCREVE xlsx (a
+  importação é OFX, parser próprio), então o high é inexplorável neste uso. Decisão:
+  mantém 0.18.5, com este registro como justificativa. Se o CDN voltar a responder,
+  trocar pelo tarball 0.20.2+.
 - Avisos residuais de `@prisma/dev` (moderate, tooling de dev) ficam documentados;
   não bloqueiam nada em produção.
 
