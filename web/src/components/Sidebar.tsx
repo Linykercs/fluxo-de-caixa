@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 import { useIsAdmin, useLogout } from "../api/auth";
 import { useBankAccounts } from "../api/bank-accounts";
 import { formatBRLNumber } from "../lib/money";
+import { ThemeSelect } from "./ThemeSelect";
 
 const NAV_MAIN = [
   { to: "/painel", label: "Painel" },
@@ -79,6 +80,7 @@ export function Sidebar() {
         </div>
       </div>
       <div className="logout">
+        <ThemeSelect id="theme-sidebar" />
         <button type="button" onClick={handleLogout} disabled={logout.isPending}>
           Sair
         </button>

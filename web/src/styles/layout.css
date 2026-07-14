@@ -459,6 +459,48 @@
   font-size: 14px;
 }
 
+/* ===== Seletor de tema ===== */
+.theme-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.theme-select select {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 13px;
+  padding: 6px 8px;
+  font-family: var(--font-body);
+}
+
+.sidebar .theme-select {
+  margin-bottom: 10px;
+  color: var(--sidebar-text);
+}
+
+.sidebar .theme-select select {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--sidebar-text);
+}
+
+.more-theme {
+  padding: 12px 18px;
+}
+
+.more-theme .theme-select {
+  font-size: 14px;
+}
+
+.more-theme select {
+  min-height: 44px;
+}
+
 /* ===== Estado de página (carregando / erro fora de card) ===== */
 .page-state {
   background: var(--surface);

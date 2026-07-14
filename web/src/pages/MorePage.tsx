@@ -1,6 +1,7 @@
 import { Link, Navigate } from "react-router-dom";
 import { useIsAdmin, useLogout } from "../api/auth";
 import { useBankAccounts } from "../api/bank-accounts";
+import { ThemeSelect } from "../components/ThemeSelect";
 import { formatBRLNumber } from "../lib/money";
 import { useIsMobile } from "../lib/useIsMobile";
 
@@ -77,6 +78,10 @@ export function MorePage() {
           </nav>
         </div>
       )}
+
+      <div className="card more-theme">
+        <ThemeSelect id="theme-more" />
+      </div>
 
       <button type="button" className="btn-secondary more-logout" onClick={handleLogout} disabled={logout.isPending}>
         Sair da conta

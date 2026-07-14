@@ -4,6 +4,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { queryClient } from "./api/queryClient";
 import { App } from "./App";
+import { applyTheme, getThemePref } from "./lib/theme";
 import "@fontsource/dm-sans/400.css";
 import "@fontsource/dm-sans/400-italic.css";
 import "@fontsource/dm-sans/500.css";
@@ -14,6 +15,9 @@ import "@fontsource/dm-mono/500.css";
 import "./styles/tokens.css";
 import "./styles/global.css";
 import "./styles/layout.css";
+
+// Antes do primeiro render, senão o tema salvo pisca.
+applyTheme(getThemePref());
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

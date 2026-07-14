@@ -34,14 +34,20 @@ export function CashFlowChart({ data }: Props) {
     <ResponsiveContainer width="100%" height={240}>
       <ComposedChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="var(--line)" />
-        <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-        <YAxis tickFormatter={formatK} tick={{ fontSize: 11 }} width={56} />
+        <XAxis dataKey="month" tick={{ fontSize: 12, fill: "var(--ink-soft)" }} />
+        <YAxis tickFormatter={formatK} tick={{ fontSize: 11, fill: "var(--ink-soft)" }} width={56} />
         <Tooltip
           formatter={(value, name) => [
             typeof value === "number" ? formatBRL(value * 100) : String(value),
             name === "receitas" ? "Receitas" : name === "despesas" ? "Despesas" : "Resultado líquido",
           ]}
-          labelStyle={{ fontWeight: 600 }}
+          labelStyle={{ fontWeight: 600, color: "var(--ink)" }}
+          contentStyle={{
+            background: "var(--surface)",
+            border: "1px solid var(--line)",
+            borderRadius: 8,
+            color: "var(--ink)",
+          }}
         />
         <Legend
           formatter={(value) =>
