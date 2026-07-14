@@ -43,6 +43,55 @@ async function downloadXlsx(rows: (string | number)[][], filename: string, sheet
   XLSX.writeFile(wb, filename);
 }
 
+// ─── Tabela genérica (lançamentos, extrato) ────────────────────────────────
+
+export interface TableExport {
+  title: string;
+  /** Nome do arquivo sem extensão. */
+  filename: string;
+  head: string[];
+  rows: (string | number)[][];
+  /** Linhas de rodapé (ex.: total). */
+  foot?: (string | number)[][];
+  orientation?: "p" | "l";
+  /** Índices de colunas alinhadas à direita (valores). */
+  rightAlign?: number[];
+}
+
+export async function exportTablePdf(table: TableExport): Promise<void> {
+  const { jsPDF: JsPdf, autoTable } = await loadPdf();
+  const doc = makePdf(JsPdf, table.title, table.orientation ?? "p");
+
+  const columnStyles: Record<number, { halign: "right" }> = {};
+  for (const index of table.rightAlign ?? []) {
+    columnStyles[index] = { halign: "right" };
+  }
+
+  autoTable(doc, {
+    startY: 26,
+    head: [table.head],
+    body: table.rows,
+    foot: table.foot,
+    theme: "striped",
+    headStyles: { fillColor: [26, 95, 180] },
+    footStyles: { fontStyle: "bold" },
+    columnStyles,
+  });
+
+  downloadPdf(doc, `${table.filename}.pdf`);
+}
+
+export async function exportTableExcel(table: TableExport, sheetName = "Dados"): Promise<void> {
+  const rows: (string | number)[][] = [
+    [table.title],
+    [],
+    table.head,
+    ...table.rows,
+    ...(table.foot ?? []),
+  ];
+  await downloadXlsx(rows, `${table.filename}.xlsx`, sheetName);
+}
+
 // ─── DRE ────────────────────────────────────────────────────────────────────
 
 export async function exportDrePdf(dre: DreReport, month: string): Promise<void> {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useBankAccounts } from "../api/bank-accounts";
 import { useCategories } from "../api/categories";
@@ -7,6 +7,7 @@ import { ApiError } from "../api/client";
 import { useDeleteEntry, useEntries } from "../api/entries";
 import type { EntryDetail, EntryDirection, EntryStatus } from "../api/types";
 import { ConfirmDialog } from "../components/ConfirmDialog";
+import { ExportDropdown } from "../components/ExportDropdown";
 import { EditEntryModal } from "../components/entries/EditEntryModal";
 import { EntryDetailModal } from "../components/entries/EntryDetailModal";
 import { EntryStatusChip } from "../components/entries/EntryStatusChip";
@@ -16,7 +17,19 @@ import { SettleModal } from "../components/entries/SettleModal";
 import { Skeleton, SkeletonRow } from "../components/Skeleton";
 import { counterpartyLabel } from "../lib/counterparty";
 import { addMonths, currentMonth, formatDate, formatMonthLong } from "../lib/dates";
+import { exportTableExcel, exportTablePdf } from "../lib/export";
 import { formatBRL } from "../lib/money";
+
+/** Busca sem caixa nem acento ("credito" acha "Crédito"). */
+function normalize(text: string): string {
+  return text.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+}
+
+const STATUS_LABELS: Record<EntryStatus, string> = {
+  OPEN: "Aberto",
+  OVERDUE: "Vencida",
+  SETTLED: "Paga",
+};
 
 type ModalState =
   | { kind: "new" }
@@ -43,8 +56,19 @@ export function EntriesPage({ direction }: EntriesPageProps) {
   const [categoryId, setCategoryId] = useState("");
   const [costCenterId, setCostCenterId] = useState("");
   const [bankAccountId, setBankAccountId] = useState("");
+  const [search, setSearch] = useState("");
   const [modal, setModal] = useState<ModalState>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // Atalho do PWA e links diretos: /a-pagar?novo=1 abre o modal de novo lançamento.
+  useEffect(() => {
+    if (searchParams.get("novo") === "1") {
+      setModal({ kind: "new" });
+      const next = new URLSearchParams(searchParams);
+      next.delete("novo");
+      setSearchParams(next, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const categoryKind = direction === "PAYABLE" ? "EXPENSE" : "INCOME";
   const { data: categories } = useCategories(categoryKind);
@@ -58,6 +82,38 @@ export function EntriesPage({ direction }: EntriesPageProps) {
     bankAccountId: bankAccountId || undefined,
   });
   const deleteEntry = useDeleteEntry(direction);
+
+  const needle = normalize(search.trim());
+  const filteredEntries = entries?.filter(
+    (entry) =>
+      needle === "" ||
+      normalize(entry.description).includes(needle) ||
+      normalize(entry.counterparty).includes(needle),
+  );
+  const totalCents = filteredEntries?.reduce((sum, entry) => sum + entry.amountCents, 0) ?? 0;
+
+  function buildExport() {
+    const list = filteredEntries ?? [];
+    return {
+      title: `${TITLES[direction]}, ${formatMonthLong(month)}`,
+      filename: `${direction === "PAYABLE" ? "a-pagar" : "a-receber"}-${month}`,
+      head: ["Descrição", counterpartyLabel(direction), "Categoria", "Centro de custo", "Vencimento", "Valor", "Status"],
+      rows: list.map((entry) => [
+        entry.description +
+          (entry.installmentTotal ? ` (${entry.installmentNumber}/${entry.installmentTotal})` : "") +
+          (entry.recurrenceId ? " (recorrente)" : ""),
+        entry.counterparty,
+        categories?.find((category) => category.id === entry.categoryId)?.name ?? "",
+        costCenters?.find((costCenter) => costCenter.id === entry.costCenterId)?.name ?? "",
+        formatDate(entry.dueDate),
+        formatBRL(entry.amountCents),
+        entry.status !== "SETTLED" && entry.settledCents > 0 ? "Parcial" : STATUS_LABELS[entry.status],
+      ]),
+      foot: [[`Total (${list.length})`, "", "", "", "", formatBRL(totalCents), ""]],
+      orientation: "l" as const,
+      rightAlign: [5],
+    };
+  }
 
   function goToMonth(target: string) {
     setSearchParams({ month: target });
@@ -95,6 +151,14 @@ export function EntriesPage({ direction }: EntriesPageProps) {
 
       <div className="toolbar">
         <div className="filters">
+          <input
+            type="search"
+            className="search-input"
+            placeholder="Buscar descrição ou nome…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            aria-label="Buscar lançamentos"
+          />
           <select value={status} onChange={(e) => setStatus(e.target.value as EntryStatus | "")}>
             <option value="">Status: todos</option>
             <option value="OPEN">Aberto</option>
@@ -129,6 +193,11 @@ export function EntriesPage({ direction }: EntriesPageProps) {
           </select>
         </div>
         <div className="spacer" />
+        <ExportDropdown
+          disabled={!filteredEntries || filteredEntries.length === 0}
+          onPdf={() => exportTablePdf(buildExport())}
+          onExcel={() => exportTableExcel(buildExport(), TITLES[direction])}
+        />
         <button type="button" className="btn-primary hide-mobile" onClick={() => setModal({ kind: "new" })}>
           + Novo lançamento
         </button>
@@ -165,14 +234,14 @@ export function EntriesPage({ direction }: EntriesPageProps) {
                 </td>
               </tr>
             )}
-            {!isLoading && !isError && entries?.length === 0 && (
+            {!isLoading && !isError && filteredEntries?.length === 0 && (
               <tr>
                 <td colSpan={7} className="hint">
-                  Nenhum lançamento neste mês.
+                  {needle ? "Nenhum lançamento encontrado pra essa busca." : "Nenhum lançamento neste mês."}
                 </td>
               </tr>
             )}
-            {entries?.map((entry) => (
+            {filteredEntries?.map((entry) => (
               <tr key={entry.id} onClick={() => setModal({ kind: "detail", entryId: entry.id })}>
                 <td>
                   <div className="cell-main">
@@ -195,12 +264,12 @@ export function EntriesPage({ direction }: EntriesPageProps) {
                 </td>
               </tr>
             ))}
-            {!isLoading && !isError && entries && entries.length > 0 && (
+            {!isLoading && !isError && filteredEntries && filteredEntries.length > 0 && (
               <tr className="total-row">
                 <td colSpan={5}>
-                  Total ({entries.length} lançamento{entries.length === 1 ? "" : "s"})
+                  Total ({filteredEntries.length} lançamento{filteredEntries.length === 1 ? "" : "s"})
                 </td>
-                <td className="r money">{formatBRL(entries.reduce((sum, entry) => sum + entry.amountCents, 0))}</td>
+                <td className="r money">{formatBRL(totalCents)}</td>
                 <td />
               </tr>
             )}
@@ -213,10 +282,12 @@ export function EntriesPage({ direction }: EntriesPageProps) {
         {isLoading &&
           [0, 1, 2, 3].map((i) => <Skeleton key={i} height={64} style={{ borderRadius: 12 }} />)}
         {isError && <div className="empty">Não foi possível carregar os lançamentos.</div>}
-        {!isLoading && !isError && entries?.length === 0 && (
-          <div className="empty">Nenhum lançamento neste mês. Toque em + para criar.</div>
+        {!isLoading && !isError && filteredEntries?.length === 0 && (
+          <div className="empty">
+            {needle ? "Nenhum lançamento encontrado pra essa busca." : "Nenhum lançamento neste mês. Toque em + para criar."}
+          </div>
         )}
-        {entries?.map((entry) => (
+        {filteredEntries?.map((entry) => (
           <button
             type="button"
             className="entry-card"
@@ -243,12 +314,12 @@ export function EntriesPage({ direction }: EntriesPageProps) {
             </span>
           </button>
         ))}
-        {!isLoading && !isError && entries && entries.length > 0 && (
+        {!isLoading && !isError && filteredEntries && filteredEntries.length > 0 && (
           <div className="entry-cards-total">
             <span>
-              Total ({entries.length} lançamento{entries.length === 1 ? "" : "s"})
+              Total ({filteredEntries.length} lançamento{filteredEntries.length === 1 ? "" : "s"})
             </span>
-            <b className="money">{formatBRL(entries.reduce((sum, entry) => sum + entry.amountCents, 0))}</b>
+            <b className="money">{formatBRL(totalCents)}</b>
           </div>
         )}
       </div>

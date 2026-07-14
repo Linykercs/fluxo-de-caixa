@@ -3,8 +3,10 @@ import { useBankAccounts, useStatement } from "../api/bank-accounts";
 import { EditAccountModal } from "../components/accounts/EditAccountModal";
 import { NewAccountModal } from "../components/accounts/NewAccountModal";
 import { TransferModal } from "../components/accounts/TransferModal";
+import { ExportDropdown } from "../components/ExportDropdown";
 import type { BankAccountSummary } from "../api/types";
 import { formatDate } from "../lib/dates";
+import { exportTableExcel, exportTablePdf } from "../lib/export";
 import { formatBRL } from "../lib/money";
 
 type ModalState = { kind: "new" } | { kind: "edit"; account: BankAccountSummary } | { kind: "transfer" } | null;
@@ -96,17 +98,46 @@ function StatementCard({ accountId, accounts, onSelectAccount, from, to, onFromC
     to: to || undefined,
   });
 
+  const accountName = accounts.find((account) => account.id === accountId)?.name ?? "conta";
+
+  function buildExport() {
+    const lines = statement?.lines ?? [];
+    return {
+      title: `Extrato, ${accountName}`,
+      filename: `extrato-${accountName.toLowerCase().replace(/\s+/g, "-")}`,
+      head: ["Data", "Descrição", "Valor", "Saldo"],
+      rows: lines.map((line) => [
+        formatDate(line.date),
+        line.description,
+        formatBRL(line.amountCents),
+        formatBRL(line.balanceCents),
+      ]),
+      foot: [
+        ["Saldo inicial", "", "", formatBRL(statement?.openingBalanceCents ?? 0)],
+        ["Saldo final", "", "", formatBRL(statement?.closingBalanceCents ?? 0)],
+      ],
+      rightAlign: [2, 3],
+    };
+  }
+
   return (
     <div className="card">
       <div className="card-header">
         <span>Extrato</span>
-        <select value={accountId} onChange={(event) => onSelectAccount(event.target.value)}>
-          {accounts.map((account) => (
-            <option key={account.id} value={account.id}>
-              {account.name}
-            </option>
-          ))}
-        </select>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <ExportDropdown
+            disabled={!statement || statement.lines.length === 0}
+            onPdf={() => exportTablePdf(buildExport())}
+            onExcel={() => exportTableExcel(buildExport(), "Extrato")}
+          />
+          <select value={accountId} onChange={(event) => onSelectAccount(event.target.value)}>
+            {accounts.map((account) => (
+              <option key={account.id} value={account.id}>
+                {account.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="statement-filters">

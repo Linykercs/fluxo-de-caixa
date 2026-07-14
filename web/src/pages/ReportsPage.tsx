@@ -1,7 +1,8 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { ApiError } from "../api/client";
 import { useIsAdmin } from "../api/auth";
 import { useCashFlowReport, useClosePeriod, useCostCenterReport, useDreReport } from "../api/reports";
+import { ExportDropdown } from "../components/ExportDropdown";
 import { MonthDetailModal } from "../components/reports/MonthDetailModal";
 import { addMonths, currentMonth, formatMonthLong, formatMonthShort } from "../lib/dates";
 import { exportDreExcel, exportDrePdf, exportObrasExcel, exportObrasPdf } from "../lib/export";
@@ -9,57 +10,6 @@ import { formatBRL } from "../lib/money";
 import type { CostCenterReport, DreReport } from "../api/types";
 
 type Tab = "categoria" | "obra";
-
-function ExportDropdown({ onPdf, onExcel, disabled }: { onPdf: () => void; onExcel: () => void; disabled: boolean }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  function handlePdf() { setOpen(false); onPdf(); }
-  function handleExcel() { setOpen(false); onExcel(); }
-
-  return (
-    <div ref={ref} style={{ position: "relative" }}>
-      <button
-        type="button"
-        className="btn-secondary"
-        disabled={disabled}
-        onClick={() => setOpen((v) => !v)}
-      >
-        Exportar ▾
-      </button>
-      {open && (
-        <div
-          style={{
-            position: "absolute",
-            right: 0,
-            top: "calc(100% + 4px)",
-            background: "var(--surface)",
-            border: "1px solid var(--line)",
-            borderRadius: 8,
-            boxShadow: "0 4px 12px rgba(0,0,0,.12)",
-            minWidth: 130,
-            zIndex: 100,
-          }}
-        >
-          <button
-            type="button"
-            onClick={handlePdf}
-            style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 14px", background: "none", border: "none", cursor: "pointer", fontSize: 13 }}
-          >
-            PDF
-          </button>
-          <button
-            type="button"
-            onClick={handleExcel}
-            style={{ display: "block", width: "100%", textAlign: "left", padding: "10px 14px", background: "none", border: "none", cursor: "pointer", fontSize: 13 }}
-          >
-            Excel
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
 
 function CostCenterRow({ cc }: { cc: CostCenterReport }) {
   const [expanded, setExpanded] = useState(false);

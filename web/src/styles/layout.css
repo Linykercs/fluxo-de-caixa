@@ -499,6 +499,23 @@
   flex: 1;
 }
 
+.toolbar .search-input {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 13px;
+  padding: 7px 10px;
+  font-family: var(--font-body);
+  width: 220px;
+  transition: border-color var(--duration-base) var(--ease);
+}
+
+.toolbar .search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 .toolbar select,
 .card-header select {
   border: 1px solid var(--line);
@@ -1487,12 +1504,17 @@ td.money.muted,
   .field select,
   .field textarea,
   .toolbar select,
+  .toolbar .search-input,
   .card-header select,
   .import-dest select,
   .import-create-fields select,
   .import-create-fields input {
     font-size: 16px;
     min-height: 44px;
+  }
+
+  .toolbar .search-input {
+    width: 100%;
   }
 
   .btn-primary,
