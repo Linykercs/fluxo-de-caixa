@@ -3,9 +3,8 @@ import { config } from "./lib/config.js";
 import { startReminderScheduler } from "./lib/scheduler.js";
 import { initWhatsApp } from "./services/whatsapp.js";
 
-// whatsapp-web.js dispara promises internas sem await/catch (ex: requestPairingCode
-// chamado dentro do próprio client.initialize()); uma rejeição não tratada aí
-// derrubaria o processo inteiro — inclusive todo o resto do app — sem esse handler.
+// Rede de segurança: uma rejeição/exceção não tratada em qualquer lugar (ex:
+// dentro do socket do WhatsApp) não deve derrubar o processo inteiro.
 process.on("unhandledRejection", (reason) => {
   console.error("[server] unhandled rejection (processo continua no ar)", reason);
 });

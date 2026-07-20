@@ -20,11 +20,10 @@ export const config = {
   telegramBotToken: process.env.TELEGRAM_BOT_TOKEN ?? null,
   telegramWebhookSecret: process.env.TELEGRAM_WEBHOOK_SECRET ?? null,
   telegramBotUsername: process.env.TELEGRAM_BOT_USERNAME ?? null,
-  // Sessão única e global do WhatsApp não-oficial (whatsapp-web.js); pesado (Chromium),
-  // por isso é opt-in mesmo com as outras variáveis presentes.
+  // Sessão única e global do WhatsApp não-oficial (Baileys, protocolo direto via
+  // WebSocket); opt-in mesmo com as outras variáveis presentes.
   whatsappEnabled: process.env.WHATSAPP_ENABLED === "true",
   whatsappSessionPath: process.env.WHATSAPP_SESSION_PATH ?? "./.whatsapp-session",
-  puppeteerExecutablePath: process.env.PUPPETEER_EXECUTABLE_PATH ?? null,
   // Se setado, usa pareamento por código (digitado no celular) em vez de QR code
   // pra vincular a sessão. Esse é o número do CELULAR QUE VAI SER O BOT, não o
   // de nenhuma organização cliente.

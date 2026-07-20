@@ -1,101 +1,93 @@
-// Sessão única e global do WhatsApp não-oficial (whatsapp-web.js): um número
-// logado manda lembretes para o número cadastrado em cada organização.
-// Diferente do Telegram, não há "vínculo" por organização: o número de
-// destino é só um campo (Organization.whatsappPhoneNumber).
-import { existsSync } from "node:fs";
+// Sessão única e global do WhatsApp não-oficial (Baileys): um número logado
+// manda lembretes para o número cadastrado em cada usuário. Diferente do
+// Telegram, não há "vínculo" por organização: o destino é por usuário
+// (User.whatsappPhoneNumber).
+//
+// Trocado de whatsapp-web.js (automação de navegador) pra Baileys (fala o
+// protocolo WhatsApp direto via WebSocket) porque o whatsapp-web.js parou de
+// completar login/envio ("No LID for user") depois de uma mudança do WhatsApp
+// no sistema de identidade "LID" — bug conhecido e sem correção disponível na
+// versão mais recente da lib. Baileys resolve LID nativamente (via onWhatsApp).
 import path from "node:path";
+import { Boom } from "@hapi/boom";
+import makeWASocket, { DisconnectReason, useMultiFileAuthState, type WASocket } from "baileys";
+import pino from "pino";
 import QRCode from "qrcode";
-// whatsapp-web.js é CommonJS ("export = "); import nomeado falha em runtime ESM
-// (o cjs-module-lexer do Node não detecta os named exports desse pacote).
-import WAWebJS from "whatsapp-web.js";
 import { config } from "../lib/config.js";
 import { BusinessError } from "../lib/errors.js";
 import type { Db } from "../lib/prisma.js";
 
-const { Client, LocalAuth } = WAWebJS;
-
 export type WhatsAppStatus = "disabled" | "starting" | "qr" | "code" | "connected" | "disconnected";
 
-let client: WAWebJS.Client | null = null;
+let sock: WASocket | null = null;
 let status: WhatsAppStatus = "disabled";
 let qrDataUrl: string | null = null;
 let pairingCode: string | null = null;
 
-// O pacote "chromium" do apt no Ubuntu do nixpacks é só um stub que exige snap
-// (não disponível em container, falha com "requires the chromium snap to be
-// installed"). Por isso NÃO tentamos detectar um Chromium do sistema: só
-// usamos PUPPETEER_EXECUTABLE_PATH se alguém setar explicitamente; sem isso,
-// deixa o puppeteer usar o Chromium que ele mesmo baixa (PUPPETEER_SKIP_DOWNLOAD
-// precisa estar "false" — ver nixpacks.toml).
-function resolveExecutablePath(): string | undefined {
-  if (config.puppeteerExecutablePath && existsSync(config.puppeteerExecutablePath)) {
-    return config.puppeteerExecutablePath;
-  }
-  return undefined;
-}
+const logger = pino({ level: "warn" });
 
 /** Inicia a sessão (1x, no boot do servidor). Não-bloqueante: erros só ficam logados. */
 export function initWhatsApp(): void {
   if (!config.whatsappEnabled) {
-    console.warn("[whatsapp] WHATSAPP_ENABLED não é \"true\"; integração desativada.");
+    console.warn('[whatsapp] WHATSAPP_ENABLED não é "true"; integração desativada.');
     return;
   }
-
   status = "starting";
-  client = new Client({
-    authStrategy: new LocalAuth({ dataPath: path.resolve(config.whatsappSessionPath) }),
-    puppeteer: { executablePath: resolveExecutablePath(), args: ["--no-sandbox", "--disable-setuid-sandbox"] },
-    // Sem webVersionCache customizado: o padrão da lib (cache local com fallback pra
-    // buscar a versão atual direto do WhatsApp se a bundled for rejeitada) se mostrou
-    // mais confiável com pareamento por código do que forçar uma versão via mirror
-    // da comunidade (causava geração do código mas a confirmação de login nunca chegava).
-    // Alternativa ao QR: digitar um código de 8 caracteres no celular
-    // (Aparelhos conectados → Vincular com número de telefone). É o número do
-    // CELULAR QUE VAI SER O BOT — não tem relação com o de nenhuma organização.
-    ...(config.whatsappPairingPhoneNumber
-      ? { pairWithPhoneNumber: { phoneNumber: normalizePhoneNumber(config.whatsappPairingPhoneNumber) } }
-      : {}),
-  });
+  void startSocket();
+}
 
-  client.on("qr", (qr) => {
-    status = "qr";
-    pairingCode = null;
-    QRCode.toDataURL(qr)
-      .then((dataUrl) => {
-        qrDataUrl = dataUrl;
-      })
-      .catch((err) => console.error("[whatsapp] falha ao gerar QR code", err));
-  });
+async function startSocket(): Promise<void> {
+  const { state, saveCreds } = await useMultiFileAuthState(path.resolve(config.whatsappSessionPath));
+  sock = makeWASocket({ auth: state, logger, browser: ["FluxoCaixa", "Chrome", "1.0"] });
+  sock.ev.on("creds.update", saveCreds);
 
-  client.on("code", (code) => {
-    status = "code";
-    qrDataUrl = null;
-    pairingCode = code;
-    console.log("[whatsapp] código de pareamento gerado");
-  });
+  // Pareamento por código (digitado no celular) em vez de QR, quando configurado.
+  // É o número do CELULAR QUE VAI SER O BOT — não tem relação com nenhuma organização cliente.
+  if (!state.creds.registered && config.whatsappPairingPhoneNumber) {
+    try {
+      const code = await sock.requestPairingCode(normalizePhoneNumber(config.whatsappPairingPhoneNumber));
+      status = "code";
+      qrDataUrl = null;
+      pairingCode = code;
+      console.log("[whatsapp] código de pareamento gerado");
+    } catch (err) {
+      console.error("[whatsapp] falha ao solicitar código de pareamento", err);
+    }
+  }
 
-  client.on("ready", () => {
-    status = "connected";
-    qrDataUrl = null;
-    pairingCode = null;
-    console.log("[whatsapp] sessão conectada");
-  });
+  sock.ev.on("connection.update", (update) => {
+    const { connection, qr, lastDisconnect } = update;
 
-  client.on("disconnected", (reason) => {
-    status = "disconnected";
-    qrDataUrl = null;
-    pairingCode = null;
-    console.warn("[whatsapp] sessão desconectada", reason);
-  });
+    if (qr && !config.whatsappPairingPhoneNumber) {
+      status = "qr";
+      pairingCode = null;
+      QRCode.toDataURL(qr)
+        .then((dataUrl) => {
+          qrDataUrl = dataUrl;
+        })
+        .catch((err) => console.error("[whatsapp] falha ao gerar QR code", err));
+    }
 
-  client.on("auth_failure", (msg) => {
-    status = "disconnected";
-    console.error("[whatsapp] falha de autenticação", msg);
-  });
+    if (connection === "open") {
+      status = "connected";
+      qrDataUrl = null;
+      pairingCode = null;
+      console.log("[whatsapp] sessão conectada");
+    }
 
-  client.initialize().catch((err) => {
-    status = "disconnected";
-    console.error("[whatsapp] falha ao inicializar", err);
+    if (connection === "close") {
+      const statusCode = (lastDisconnect?.error as Boom | undefined)?.output?.statusCode;
+      const loggedOut = statusCode === DisconnectReason.loggedOut;
+      status = "disconnected";
+      qrDataUrl = null;
+      pairingCode = null;
+      console.warn("[whatsapp] sessão desconectada", statusCode ?? lastDisconnect?.error);
+      // Qualquer motivo que não seja "deslogado no celular" costuma ser transitório
+      // (queda de rede, restart exigido pelo servidor do WhatsApp etc): reconecta sozinho.
+      if (!loggedOut) {
+        setTimeout(() => void startSocket(), 2000);
+      }
+    }
   });
 }
 
@@ -117,18 +109,15 @@ export function normalizePhoneNumber(input: string): string {
 }
 
 export async function sendWhatsAppMessage(phoneNumber: string, text: string): Promise<void> {
-  if (!client || status !== "connected") {
+  if (!sock || status !== "connected") {
     throw new BusinessError("WHATSAPP_NOT_CONNECTED", "Sessão do WhatsApp não está conectada");
   }
-  // Montar "<numero>@c.us" na mão falha com "No LID for user" no WhatsApp atual
-  // (rollout do sistema de identidade LID). getNumberId resolve o ID de verdade
-  // (LID ou c.us, o que for correto pra esse contato) antes de mandar.
   const normalized = normalizePhoneNumber(phoneNumber);
-  const wid = await client.getNumberId(normalized);
-  if (!wid) {
+  const [result] = (await sock.onWhatsApp(normalized)) ?? [];
+  if (!result?.exists) {
     throw new BusinessError("WHATSAPP_NUMBER_NOT_REGISTERED", "Esse número não está registrado no WhatsApp");
   }
-  await client.sendMessage(wid._serialized, text);
+  await sock.sendMessage(result.jid, { text });
 }
 
 export async function getUserPhoneNumber(db: Db, userId: string): Promise<string | null> {
