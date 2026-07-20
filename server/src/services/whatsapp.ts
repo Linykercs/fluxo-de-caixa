@@ -36,7 +36,14 @@ export function initWhatsApp(): void {
   void startSocket();
 }
 
+let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+
 async function startSocket(): Promise<void> {
+  if (reconnectTimer) {
+    clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+  }
+
   const { state, saveCreds } = await useMultiFileAuthState(path.resolve(config.whatsappSessionPath));
   // A versão de protocolo embutida no Baileys "legacy" (6.7.23) já ficou velha
   // o suficiente pro WhatsApp rejeitar a conexão de cara (desconecta com 405);
@@ -51,6 +58,11 @@ async function startSocket(): Promise<void> {
   let pairingRequested = false;
 
   socket.ev.on("connection.update", (update) => {
+    // Socket velho, já substituído por uma reconexão mais nova: ignora pra não
+    // ter dois sockets brigando pela mesma sessão salva (foi isso que causava
+    // desconexões em loop e pareamento falhando na confirmação).
+    if (sock !== socket) return;
+
     const { connection, qr, lastDisconnect } = update;
 
     if (qr && !state.creds.registered && config.whatsappPairingPhoneNumber && !pairingRequested) {
@@ -94,7 +106,7 @@ async function startSocket(): Promise<void> {
       pairingCode = null;
       console.warn("[whatsapp] sessão desconectada", statusCode ?? lastDisconnect?.error);
       if (!finalLogout) {
-        setTimeout(() => void startSocket(), 3000);
+        reconnectTimer = setTimeout(() => void startSocket(), 3000);
       }
     }
   });
