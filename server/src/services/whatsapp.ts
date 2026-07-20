@@ -10,7 +10,7 @@
 // versão mais recente da lib. Baileys resolve LID nativamente (via onWhatsApp).
 import path from "node:path";
 import { Boom } from "@hapi/boom";
-import makeWASocket, { DisconnectReason, useMultiFileAuthState, type WASocket } from "baileys";
+import makeWASocket, { DisconnectReason, fetchLatestBaileysVersion, useMultiFileAuthState, type WASocket } from "baileys";
 import pino from "pino";
 import QRCode from "qrcode";
 import { config } from "../lib/config.js";
@@ -38,7 +38,11 @@ export function initWhatsApp(): void {
 
 async function startSocket(): Promise<void> {
   const { state, saveCreds } = await useMultiFileAuthState(path.resolve(config.whatsappSessionPath));
-  const socket = makeWASocket({ auth: state, logger, browser: ["FluxoCaixa", "Chrome", "1.0"] });
+  // A versão de protocolo embutida no Baileys "legacy" (6.7.23) já ficou velha
+  // o suficiente pro WhatsApp rejeitar a conexão de cara (desconecta com 405);
+  // buscar a versão atual evita isso.
+  const { version } = await fetchLatestBaileysVersion().catch(() => ({ version: undefined }));
+  const socket = makeWASocket({ auth: state, version, logger, browser: ["FluxoCaixa", "Chrome", "1.0"] });
   sock = socket;
   socket.ev.on("creds.update", saveCreds);
   // Pedir o código cedo demais (antes do WebSocket estabilizar) falha com
