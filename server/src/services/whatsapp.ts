@@ -38,27 +38,31 @@ export function initWhatsApp(): void {
 
 async function startSocket(): Promise<void> {
   const { state, saveCreds } = await useMultiFileAuthState(path.resolve(config.whatsappSessionPath));
-  sock = makeWASocket({ auth: state, logger, browser: ["FluxoCaixa", "Chrome", "1.0"] });
-  sock.ev.on("creds.update", saveCreds);
+  const socket = makeWASocket({ auth: state, logger, browser: ["FluxoCaixa", "Chrome", "1.0"] });
+  sock = socket;
+  socket.ev.on("creds.update", saveCreds);
+  // Pedir o código cedo demais (antes do WebSocket estabilizar) falha com
+  // "Connection Closed"; a chegada do primeiro QR é o sinal de que o socket
+  // está pronto pra aceitar requestPairingCode. Uma vez por socket.
+  let pairingRequested = false;
 
-  // Pareamento por código (digitado no celular) em vez de QR, quando configurado.
-  // É o número do CELULAR QUE VAI SER O BOT — não tem relação com nenhuma organização cliente.
-  if (!state.creds.registered && config.whatsappPairingPhoneNumber) {
-    try {
-      const code = await sock.requestPairingCode(normalizePhoneNumber(config.whatsappPairingPhoneNumber));
-      status = "code";
-      qrDataUrl = null;
-      pairingCode = code;
-      console.log("[whatsapp] código de pareamento gerado");
-    } catch (err) {
-      console.error("[whatsapp] falha ao solicitar código de pareamento", err);
-    }
-  }
-
-  sock.ev.on("connection.update", (update) => {
+  socket.ev.on("connection.update", (update) => {
     const { connection, qr, lastDisconnect } = update;
 
-    if (qr && !config.whatsappPairingPhoneNumber) {
+    if (qr && !state.creds.registered && config.whatsappPairingPhoneNumber && !pairingRequested) {
+      // Pareamento por código (digitado no celular) em vez de QR. É o número do
+      // CELULAR QUE VAI SER O BOT — não tem relação com nenhuma organização cliente.
+      pairingRequested = true;
+      socket
+        .requestPairingCode(normalizePhoneNumber(config.whatsappPairingPhoneNumber))
+        .then((code) => {
+          status = "code";
+          qrDataUrl = null;
+          pairingCode = code;
+          console.log(`[whatsapp] código de pareamento gerado: ${code}`);
+        })
+        .catch((err) => console.error("[whatsapp] falha ao solicitar código de pareamento", err));
+    } else if (qr && !config.whatsappPairingPhoneNumber) {
       status = "qr";
       pairingCode = null;
       QRCode.toDataURL(qr)
@@ -77,15 +81,16 @@ async function startSocket(): Promise<void> {
 
     if (connection === "close") {
       const statusCode = (lastDisconnect?.error as Boom | undefined)?.output?.statusCode;
-      const loggedOut = statusCode === DisconnectReason.loggedOut;
+      // 401 (loggedOut) só é definitivo com sessão registrada (usuário desvinculou
+      // no celular); durante um pareamento incompleto ele é esperado e deve reiniciar
+      // o ciclo pra gerar QR/código novos.
+      const finalLogout = statusCode === DisconnectReason.loggedOut && state.creds.registered;
       status = "disconnected";
       qrDataUrl = null;
       pairingCode = null;
       console.warn("[whatsapp] sessão desconectada", statusCode ?? lastDisconnect?.error);
-      // Qualquer motivo que não seja "deslogado no celular" costuma ser transitório
-      // (queda de rede, restart exigido pelo servidor do WhatsApp etc): reconecta sozinho.
-      if (!loggedOut) {
-        setTimeout(() => void startSocket(), 2000);
+      if (!finalLogout) {
+        setTimeout(() => void startSocket(), 3000);
       }
     }
   });
