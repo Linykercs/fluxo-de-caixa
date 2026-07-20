@@ -20,7 +20,6 @@ model Organization {
   closedThroughMonth  String? // "YYYY-MM"; lançamentos com competência <= este mês são bloqueados
   telegramChatId      String? // preenchido quando o /start <token> do bot é confirmado
   telegramLinkToken   String?  @unique // token mostrado na tela de Notificações para o /start
-  whatsappPhoneNumber String? // E.164 (ex: "5511999998888"); sessão do bot é única e global, não por org
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
@@ -38,14 +37,15 @@ model Organization {
 }
 
 model User {
-  id             String   @id @default(cuid())
-  organizationId String
-  name           String
-  email          String   @unique
-  passwordHash   String
-  role           String   @default("ADMIN")
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id                  String   @id @default(cuid())
+  organizationId      String
+  name                String
+  email               String   @unique
+  passwordHash        String
+  role                String   @default("ADMIN")
+  whatsappPhoneNumber String? // E.164 (ex: "5511999998888"); sessão do bot é única e global, mas o destino é por usuário
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   organization Organization @relation(fields: [organizationId], references: [id])
   settlements  Settlement[]

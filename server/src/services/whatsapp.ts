@@ -123,20 +123,16 @@ export async function sendWhatsAppMessage(phoneNumber: string, text: string): Pr
   await client.sendMessage(`${normalizePhoneNumber(phoneNumber)}@c.us`, text);
 }
 
-export async function getOrganizationPhoneNumber(db: Db, organizationId: string): Promise<string | null> {
-  const organization = await db.organization.findUniqueOrThrow({ where: { id: organizationId } });
-  return organization.whatsappPhoneNumber;
+export async function getUserPhoneNumber(db: Db, userId: string): Promise<string | null> {
+  const user = await db.user.findUniqueOrThrow({ where: { id: userId } });
+  return user.whatsappPhoneNumber;
 }
 
-export async function setOrganizationPhoneNumber(
-  db: Db,
-  organizationId: string,
-  phoneNumber: string | null,
-): Promise<string | null> {
+export async function setUserPhoneNumber(db: Db, userId: string, phoneNumber: string | null): Promise<string | null> {
   const normalized = phoneNumber ? normalizePhoneNumber(phoneNumber) : null;
-  const organization = await db.organization.update({
-    where: { id: organizationId },
+  const user = await db.user.update({
+    where: { id: userId },
     data: { whatsappPhoneNumber: normalized },
   });
-  return organization.whatsappPhoneNumber;
+  return user.whatsappPhoneNumber;
 }

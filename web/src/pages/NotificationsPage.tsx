@@ -175,8 +175,8 @@ export function NotificationsPage() {
           {wa && (
             <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 14 }}>
               <p style={{ margin: 0, color: "var(--ink-soft)" }}>
-                Sessão única do servidor (não é por usuário); cadastre aqui o número que deve receber os avisos desta
-                organização.
+                A sessão do bot é única no servidor, mas o número de destino é pessoal — cadastre aqui o seu WhatsApp
+                para receber os avisos.
               </p>
 
               {wa.status === "qr" && wa.qrDataUrl && (

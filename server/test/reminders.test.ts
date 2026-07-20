@@ -124,9 +124,9 @@ describe("runReminders", () => {
     expect(sentMessages).toHaveLength(0);
   });
 
-  it("avisa por WhatsApp quando a organização tem número cadastrado", async () => {
-    // já normalizado (com DDI), como fica gravado por setOrganizationPhoneNumber em produção.
-    await db.prisma.organization.update({ where: { id: fx.org.id }, data: { whatsappPhoneNumber: "5511999998888" } });
+  it("avisa por WhatsApp quando o usuário tem número cadastrado", async () => {
+    // já normalizado (com DDI), como fica gravado por setUserPhoneNumber em produção.
+    await db.prisma.user.update({ where: { id: fx.user.id }, data: { whatsappPhoneNumber: "5511999998888" } });
     await newEntry("2026-06-01");
 
     // fx.org já tem telegramChatId desde um teste anterior: os dois canais disparam juntos.

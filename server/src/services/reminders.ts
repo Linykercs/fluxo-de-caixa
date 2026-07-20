@@ -29,10 +29,10 @@ export interface ReminderResult {
 interface NotifiableOrg {
   id: string;
   telegramChatId: string | null;
-  whatsappPhoneNumber: string | null;
+  whatsappPhoneNumbers: string[];
 }
 
-/** Manda `text` por todos os canais configurados na org; uma falha num canal não impede o outro. */
+/** Manda `text` por todos os canais configurados na org (Telegram é 1 chat; WhatsApp é 1 por usuário cadastrado). */
 async function deliver(org: NotifiableOrg, text: string): Promise<number> {
   let sent = 0;
   if (org.telegramChatId) {
@@ -43,12 +43,12 @@ async function deliver(org: NotifiableOrg, text: string): Promise<number> {
       console.error(`[reminders] falha ao enviar Telegram (org ${org.id})`, err);
     }
   }
-  if (org.whatsappPhoneNumber) {
+  for (const phoneNumber of org.whatsappPhoneNumbers) {
     try {
-      await sendWhatsAppMessage(org.whatsappPhoneNumber, text);
+      await sendWhatsAppMessage(phoneNumber, text);
       sent += 1;
     } catch (err) {
-      console.error(`[reminders] falha ao enviar WhatsApp (org ${org.id})`, err);
+      console.error(`[reminders] falha ao enviar WhatsApp (org ${org.id}, ${phoneNumber})`, err);
     }
   }
   return sent;
@@ -57,11 +57,23 @@ async function deliver(org: NotifiableOrg, text: string): Promise<number> {
 /** Processa lembretes de todas as organizações com algum canal configurado. Seguro de rodar repetidas vezes. */
 export async function runReminders(db: Db, today: string = todaySP()): Promise<ReminderResult> {
   const organizations = await db.organization.findMany({
-    where: { OR: [{ telegramChatId: { not: null } }, { whatsappPhoneNumber: { not: null } }] },
+    where: {
+      OR: [{ telegramChatId: { not: null } }, { users: { some: { whatsappPhoneNumber: { not: null } } } }],
+    },
+    include: {
+      users: { where: { whatsappPhoneNumber: { not: null } }, select: { whatsappPhoneNumber: true } },
+    },
   });
   let messagesSent = 0;
 
   for (const org of organizations) {
+    const notifiable: NotifiableOrg = {
+      id: org.id,
+      telegramChatId: org.telegramChatId,
+      whatsappPhoneNumbers: org.users
+        .map((u) => u.whatsappPhoneNumber)
+        .filter((phoneNumber): phoneNumber is string => phoneNumber !== null),
+    };
     try {
       const dueTodayEntries = await db.entry.findMany({
         where: { organizationId: org.id, deletedAt: null, dueDate: toDate(today), dueTodayNotifiedAt: null },
@@ -83,12 +95,12 @@ export async function runReminders(db: Db, today: string = todaySP()): Promise<R
       let dueTodaySent = true;
       let dueSoonSent = true;
       if (openDueToday.length > 0) {
-        const sent = await deliver(org, buildMessage("📅 Vencendo hoje:", openDueToday));
+        const sent = await deliver(notifiable, buildMessage("📅 Vencendo hoje:", openDueToday));
         messagesSent += sent;
         dueTodaySent = sent > 0;
       }
       if (openDueSoon.length > 0) {
-        const sent = await deliver(org, buildMessage("⏰ Vencendo amanhã:", openDueSoon));
+        const sent = await deliver(notifiable, buildMessage("⏰ Vencendo amanhã:", openDueSoon));
         messagesSent += sent;
         dueSoonSent = sent > 0;
       }

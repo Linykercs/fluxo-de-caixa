@@ -10,12 +10,7 @@ import {
   sendTelegramMessage,
   unlinkTelegram,
 } from "../services/telegram.js";
-import {
-  getOrganizationPhoneNumber,
-  getWhatsAppStatus,
-  sendWhatsAppMessage,
-  setOrganizationPhoneNumber,
-} from "../services/whatsapp.js";
+import { getUserPhoneNumber, getWhatsAppStatus, sendWhatsAppMessage, setUserPhoneNumber } from "../services/whatsapp.js";
 
 export async function notificationsRoutes(app: FastifyInstance) {
   app.get("/notifications/telegram", async (request) => {
@@ -51,22 +46,22 @@ export async function notificationsRoutes(app: FastifyInstance) {
 
   app.get("/notifications/whatsapp", async (request) => {
     const [phoneNumber, sessionStatus] = await Promise.all([
-      getOrganizationPhoneNumber(app.prisma, request.user.organizationId),
+      getUserPhoneNumber(app.prisma, request.user.sub),
       Promise.resolve(getWhatsAppStatus()),
     ]);
     return { phoneNumber, ...sessionStatus };
   });
 
+  // Número é preferência pessoal (cada usuário recebe no próprio celular),
+  // por isso não exige admin — diferente do vínculo do Telegram, que ainda é por organização.
   app.post("/notifications/whatsapp/number", async (request) => {
-    assertAdmin(request);
     const { phoneNumber } = request.body as { phoneNumber: string | null };
-    const saved = await setOrganizationPhoneNumber(app.prisma, request.user.organizationId, phoneNumber);
+    const saved = await setUserPhoneNumber(app.prisma, request.user.sub, phoneNumber);
     return { phoneNumber: saved };
   });
 
   app.post("/notifications/whatsapp/test", async (request) => {
-    assertAdmin(request);
-    const phoneNumber = await getOrganizationPhoneNumber(app.prisma, request.user.organizationId);
+    const phoneNumber = await getUserPhoneNumber(app.prisma, request.user.sub);
     if (!phoneNumber) {
       throw new BusinessError("WHATSAPP_NUMBER_NOT_SET", "Cadastre um número de WhatsApp antes de testar o envio");
     }
