@@ -120,7 +120,15 @@ export async function sendWhatsAppMessage(phoneNumber: string, text: string): Pr
   if (!client || status !== "connected") {
     throw new BusinessError("WHATSAPP_NOT_CONNECTED", "Sessão do WhatsApp não está conectada");
   }
-  await client.sendMessage(`${normalizePhoneNumber(phoneNumber)}@c.us`, text);
+  // Montar "<numero>@c.us" na mão falha com "No LID for user" no WhatsApp atual
+  // (rollout do sistema de identidade LID). getNumberId resolve o ID de verdade
+  // (LID ou c.us, o que for correto pra esse contato) antes de mandar.
+  const normalized = normalizePhoneNumber(phoneNumber);
+  const wid = await client.getNumberId(normalized);
+  if (!wid) {
+    throw new BusinessError("WHATSAPP_NUMBER_NOT_REGISTERED", "Esse número não está registrado no WhatsApp");
+  }
+  await client.sendMessage(wid._serialized, text);
 }
 
 export async function getUserPhoneNumber(db: Db, userId: string): Promise<string | null> {
