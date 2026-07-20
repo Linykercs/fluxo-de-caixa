@@ -15,6 +15,7 @@ Internet ──▶ Cloudflare Tunnel (cloudflared) ──▶ localhost:3333 ─�
 - O banco é SQLite em arquivo, sem serviço de banco separado.
 - O acesso público passa por um **Cloudflare Tunnel**, que não exige porta aberta no roteador nem IP fixo.
 - O Mac mini também é acessível **diretamente pela rede Tailscale** (sem passar pelo túnel), útil para administração.
+- **URL pública fixa desde 2026-07-20**: `https://fluxocaixa.app.br` (domínio próprio, comprado no Registro.br, com túnel Cloudflare **nomeado** — não muda mais, ver seção 2 abaixo).
 
 ## Onde as coisas estão
 
@@ -33,13 +34,13 @@ Repo remoto: `https://github.com/Linykercs/fluxo-de-caixa.git` (mesmo repo do Ra
 
 ## Webhook do Telegram
 
-O webhook do bot aponta pra URL pública do túnel. **Se o túnel reiniciar e a URL mudar, o bot para de receber mensagens** até reapontar. Em 2026-07-13 ele ainda apontava pro Railway morto; foi reapontado com:
+O webhook do bot aponta pra `https://fluxocaixa.app.br/telegram/webhook/<secret>`. Como a URL agora é fixa (túnel nomeado), não precisa mais reapontar isso — mas se algum dia for necessário (ex: rotacionar o `TELEGRAM_WEBHOOK_SECRET`), o comando é:
 
 ```bash
 cd ~/servidor-apps/fluxo-de-caixa/server
 tok=$(/usr/libexec/PlistBuddy -c "Print :EnvironmentVariables:TELEGRAM_BOT_TOKEN" ~/Library/LaunchAgents/com.servidor.fluxo-de-caixa.plist)
 sec=$(/usr/libexec/PlistBuddy -c "Print :EnvironmentVariables:TELEGRAM_WEBHOOK_SECRET" ~/Library/LaunchAgents/com.servidor.fluxo-de-caixa.plist)
-TELEGRAM_BOT_TOKEN=$tok TELEGRAM_WEBHOOK_SECRET=$sec npx tsx scripts/set-telegram-webhook.ts <url-publica-atual>
+TELEGRAM_BOT_TOKEN=$tok TELEGRAM_WEBHOOK_SECRET=$sec npx tsx scripts/set-telegram-webhook.ts https://fluxocaixa.app.br
 ```
 
 ## Como acessar o Mac mini
@@ -78,18 +79,19 @@ tail -f ~/Library/Logs/fluxo-de-caixa/out.log
 
 - Tipo: **LaunchDaemon** de sistema (roda mesmo sem sessão de usuário logada).
 - Arquivo: `/Library/LaunchDaemons/com.fluxocaixa.tunnel.plist`
-- Executa `cloudflared tunnel --url http://localhost:3333` — modo **Quick Tunnel** (sem conta/domínio associado).
-- ⚠️ **A URL pública muda toda vez que esse serviço reinicia** (reboot do Mac, crash, etc). É o modo gratuito sem domínio fixo — ver seção "Domínio fixo" abaixo. Como o app é um PWA, o navegador pode continuar mostrando a tela de login em cache mesmo com a URL antiga morta (o service worker serve o HTML do cache); a chamada de login então falha com "Não foi possível entrar". Solução: pegar a URL atual (comando abaixo) e abrir ela de novo / limpar dados do site da URL antiga.
+- Desde **2026-07-20**: executa `cloudflared tunnel run --token <token>` — modo **túnel nomeado**, associado ao domínio fixo `fluxocaixa.app.br` (Tunnel ID `77f08270-c37d-4a23-ab56-28b1be19b790`, ver `docs/credentials.local.md` pro token). A URL **não muda mais**, mesmo que o serviço reinicie.
+- Antes disso o túnel rodava em modo **Quick Tunnel** (`--url http://localhost:3333`, sem domínio, URL aleatória que trocava a cada restart) — histórico da migração na seção "Domínio fixo" abaixo.
+- Roteamento (`fluxocaixa.app.br` → `localhost:3333`) e DNS ficam configurados do lado da Cloudflare (dashboard/API), não no plist.
 
 Comandos úteis (precisam de `sudo`, é LaunchDaemon de sistema):
 
 ```bash
-# reiniciar o túnel (gera URL nova)
+# reiniciar o túnel (a URL continua a mesma depois de reiniciar)
 sudo launchctl bootout system/com.fluxocaixa.tunnel
 sudo launchctl bootstrap system /Library/LaunchDaemons/com.fluxocaixa.tunnel.plist
 
-# pegar a URL pública atual
-grep -o 'https://[a-z-]*\.trycloudflare\.com' ~/Library/Logs/cloudflared/tunnel.log | tail -1
+# ver se está rodando
+ps aux | grep '[c]loudflared'
 ```
 
 ### 3. Healthcheck + auto-reaponte do webhook (`com.fluxocaixa.healthcheck`)
@@ -97,10 +99,9 @@ grep -o 'https://[a-z-]*\.trycloudflare\.com' ~/Library/Logs/cloudflared/tunnel.
 - Tipo: **LaunchAgent** de usuário, roda `deploy/healthcheck-fluxo.sh` a cada 10 minutos (`StartInterval: 600`).
 - Faz duas coisas:
   1. Checa `http://localhost:3333/health`; se o estado mudar (subiu/caiu), avisa via Telegram (usando o `telegramChatId` das organizações no banco).
-  2. Detecta se a URL do Quick Tunnel mudou desde a última checagem e, se mudou, **reaponta o webhook do bot sozinho** (`setWebhook`) e avisa no Telegram com a URL nova.
+  2. Detecta se a URL do túnel mudou desde a última checagem (baseado no log do `cloudflared`) e, se mudou, reaponta o webhook do bot sozinho (`setWebhook`) e avisa no Telegram com a URL nova. Isso era essencial na época do Quick Tunnel; agora que o túnel é nomeado e a URL é fixa (`fluxocaixa.app.br`), essa parte do script normalmente fica inerte — mas continua útil como rede de segurança caso o túnel precise voltar ao modo Quick Tunnel por algum motivo.
 - Estado salvo em `~/.fluxocaixa-health/` (`app-state`, `tunnel-url`).
 - Logs: `~/Library/Logs/fluxo-de-caixa/healthcheck.log`.
-- Isso significa que o bot do Telegram não quebra mais quando a URL muda — só o link salvo no navegador/atalho é que fica desatualizado (ver aviso acima).
 
 ### 4. Backup diário do banco (`com.fluxocaixa.backup`)
 
@@ -109,13 +110,15 @@ grep -o 'https://[a-z-]*\.trycloudflare\.com' ~/Library/Logs/cloudflared/tunnel.
 - Retenção de 30 dias (apaga backups mais antigos automaticamente).
 - Logs: `~/Library/Logs/fluxo-de-caixa/backup.log`.
 
-## Domínio fixo (pendente)
+## Domínio fixo — resolvido em 2026-07-20
 
-A URL pública atual (`*.trycloudflare.com`) é temporária. O plano é:
+A tentativa inicial foi usar um subdomínio grátis (`fluxocaixa.eu.org` — site do eu.org ficou fora do ar; depois `is-a.dev`, que não permite esse uso). Solução final: comprado um domínio próprio.
 
-1. Zona `fluxocaixa.eu.org` já criada na Cloudflare (conta `linykermc@unipam.edu.br`), com nameservers `owen.ns.cloudflare.com` e `tessa.ns.cloudflare.com`.
-2. Falta registrar esse subdomínio no **eu.org** apontando pra esses nameservers (o site do eu.org estava fora do ar em 2026-07-12 — tentar de novo mais tarde, ou ver alternativa sugerida por outra ferramenta).
-3. Quando aprovado: criar um **túnel nomeado** (não mais Quick Tunnel) via `cloudflared tunnel create`, rodar `cloudflared tunnel route dns` apontando `fluxocaixa.eu.org` pro túnel, e trocar o `ProgramArguments` do `com.fluxocaixa.tunnel.plist` de `--url http://localhost:3333` para `--config <arquivo-de-config-do-tunnel-nomeado>`. Isso dá uma URL **fixa**, que não muda mais.
+- **Domínio**: `fluxocaixa.app.br`, comprado no Registro.br (~R$40/ano, pedido 47281134).
+- **Zona Cloudflare**: Zone ID `1b38e3b7916dab00bc1b379b603a9921`, SSL "Full", HTTPS forçado, TLS mínimo 1.2.
+- **Túnel nomeado**: `fluxo-de-caixa-mac-mini`, Tunnel ID `77f08270-c37d-4a23-ab56-28b1be19b790`, criado e roteado via API da Cloudflare (ingress `fluxocaixa.app.br` → `http://localhost:3333`).
+- **Cutover**: LaunchDaemon `com.fluxocaixa.tunnel` trocado de `cloudflared tunnel --url ...` (Quick Tunnel) para `cloudflared tunnel run --token ...` (túnel nomeado); `CORS_ORIGIN` do app atualizado pra `https://fluxocaixa.app.br`; webhook do Telegram reapontado. Tudo sem downtime perceptível (túnel novo testado em paralelo antes da troca).
+- Token do túnel e detalhes completos: `docs/credentials.local.md`.
 
 ## Deploy de código novo
 
